@@ -1,0 +1,9 @@
+spring:
+  application:
+    name: system
+  profiles:
+    active: dev
+  cloud:
+    config:
+      uri: http://localhost:9800
+      fail-fast: true

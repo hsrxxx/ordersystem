@@ -1,0 +1,12 @@
+server:
+  port: 9800
+spring:
+  application:
+    name: configsever
+  profiles:
+    active: native
+  cloud:
+    config:
+      server:
+        native:
+          search-locations: classpath:/shared
