@@ -1,10 +1,14 @@
 package com.hsrxxx.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.hsrxxx.common.core.constant.UserConstants;
 import com.hsrxxx.common.core.utils.SecurityUtils;
 import com.hsrxxx.common.core.utils.StringUtils;
 import com.hsrxxx.entity.SysMenu;
+import com.hsrxxx.entity.SysRole;
+import com.hsrxxx.entity.SysRoleMenu;
 import com.hsrxxx.entity.SysUser;
+import com.hsrxxx.entity.vo.MetaVo;
 import com.hsrxxx.entity.vo.TreeSelect;
 import com.hsrxxx.mapper.SysMenuMapper;
 import com.hsrxxx.mapper.SysRoleMapper;
@@ -15,10 +19,8 @@ import com.hsrxxx.system.entity.vo.RouterVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * <p>
@@ -34,16 +36,22 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu> impl
     @Autowired
     private SysMenuMapper menuMapper;
 
-    @Autowired
-    private SysRoleMapper roleMapper;
+//    @Autowired
+//    private SysRoleMapper roleMapper;
 
     @Autowired
     private SysRoleMenuMapper roleMenuMapper;
 
+    /**
+     * 根据用户查询系统菜单列表
+     *
+     * @param userId 用户ID
+     * @return 菜单列表
+     */
     @Override
     public List<SysMenu> selectMenuList(Long userId) {
 
-        List<SysMenu> menuList = null;
+        List<SysMenu> menuList;
         // 管理员显示所有菜单信息
         if (SysUser.isAdmin(userId))
         {
@@ -56,16 +64,18 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu> impl
         return menuList;
     }
 
+    /**
+     * 根据用户ID查询菜单
+     *
+     * @param userId 用户名称
+     * @return 菜单列表
+     */
     @Override
     public List<SysMenu> selectMenuTreeByUserId(Long userId) {
-        List<SysMenu> menus = null;
+        List<SysMenu> menus;
         if (SecurityUtils.isAdmin(userId))
         {
-            QueryWrapper<SysMenu> query = new QueryWrapper<>();
-            query.eq("menu_type",'M');
-            query.eq("menu_type",'C');
-            query.eq("status",'0');
-            menus = menuMapper.selectList(query);
+            menus = menuMapper.selectMenuTreeAll();
         }
         else
         {
@@ -74,59 +84,141 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu> impl
         return getChildPerms(menus, 0);
     }
 
+    /**
+     * 根据角色ID查询菜单树信息
+     *
+     * @param roleId 角色ID
+     * @return 选中菜单列表
+     */
     @Override
     public List<Integer> selectMenuListByRoleId(Long roleId) {
-        return null;
+//        SysRole role = roleMapper.selectById(roleId);
+        return menuMapper.selectMenuListByRoleId(roleId);
     }
 
+    /**
+     * 构建前端路由所需要的菜单
+     *
+     * @param menus 菜单列表
+     * @return 路由列表
+     */
     @Override
     public List<RouterVo> buildMenus(List<SysMenu> menus) {
-        return null;
+        List<RouterVo> routers = new LinkedList<RouterVo>();
+        for (SysMenu menu : menus)
+        {
+            RouterVo router = new RouterVo();
+            router.setHidden("1".equals(menu.getVisible()));
+            router.setName(getRouteName(menu));
+            router.setPath(getRouterPath(menu));
+            router.setComponent(getComponent(menu));
+            router.setMeta(new MetaVo(menu.getName(), menu.getIcon(), StringUtils.equals("1", String.valueOf(menu.getIsCache()))));
+            List<SysMenu> cMenus = menu.getChildren();
+            if (!cMenus.isEmpty() && cMenus.size() > 0 && UserConstants.TYPE_DIR.equals(menu.getMenuType()))
+            {
+                router.setAlwaysShow(true);
+                router.setRedirect("noRedirect");
+                router.setChildren(buildMenus(cMenus));
+            }
+            else if (isMeunFrame(menu))
+            {
+                List<RouterVo> childrenList = new ArrayList<RouterVo>();
+                RouterVo children = new RouterVo();
+                children.setPath(menu.getPath());
+                children.setComponent(menu.getComponent());
+                children.setName(StringUtils.capitalize(menu.getPath()));
+                children.setMeta(new MetaVo(menu.getName(), menu.getIcon(), StringUtils.equals("1", String.valueOf(menu.getIsCache()))));
+                childrenList.add(children);
+                router.setChildren(childrenList);
+            }
+            routers.add(router);
+        }
+        return routers;
     }
 
+    /**
+     * 构建前端所需要树结构
+     *
+     * @param menus 菜单列表
+     * @return 树结构列表
+     */
     @Override
     public List<SysMenu> buildMenuTree(List<SysMenu> menus) {
-        return null;
+        List<SysMenu> returnList = new ArrayList<SysMenu>();
+        List<Long> tempList = new ArrayList<Long>();
+        for (SysMenu dept : menus)
+        {
+            // 获取菜单id
+            tempList.add(dept.getId());
+        }
+        for (SysMenu menu : menus)
+        {
+            // 如果是顶级节点, 遍历该父节点的所有子节点
+            if (!tempList.contains(menu.getParentId()))
+            {
+                recursionFn(menus, menu);
+                returnList.add(menu);
+            }
+        }
+        if (returnList.isEmpty())
+        {
+            returnList = menus;
+        }
+        return returnList;
     }
 
+    /**
+     * 构建前端所需要下拉树结构
+     *
+     * @param menus 菜单列表
+     * @return 下拉树结构列表
+     */
     @Override
     public List<TreeSelect> buildMenuTreeSelect(List<SysMenu> menus) {
-        return null;
+        List<SysMenu> menuTrees = buildMenuTree(menus);
+        return menuTrees.stream().map(TreeSelect::new).collect(Collectors.toList());
     }
 
-    @Override
-    public SysMenu selectMenuById(Long menuId) {
-        return null;
-    }
-
+    /**
+     * 是否存在菜单子节点
+     *
+     * @param menuId 菜单ID
+     * @return 结果
+     */
     @Override
     public boolean hasChildByMenuId(Long menuId) {
-        return false;
+        QueryWrapper<SysMenu> query = new QueryWrapper<>();
+        query.eq("parent_id", menuId);
+        int result = menuMapper.selectCount(query);
+        return result > 0;
     }
 
+    /**
+     * 查询菜单使用数量
+     *
+     * @param menuId 菜单ID
+     * @return 结果
+     */
     @Override
     public boolean checkMenuExistRole(Long menuId) {
-        return false;
-    }
-
-    @Override
-    public int insertMenu(SysMenu menu) {
-        return 0;
-    }
-
-    @Override
-    public int updateMenu(SysMenu menu) {
-        return 0;
-    }
-
-    @Override
-    public int deleteMenuById(Long menuId) {
-        return 0;
+        QueryWrapper<SysRoleMenu> query = new QueryWrapper<>();
+        query.eq("menu_id", menuId);
+        int result = roleMenuMapper.selectCount(query);
+        return result > 0;
     }
 
     @Override
     public String checkMenuNameUnique(SysMenu menu) {
-        return null;
+        Long menuId = StringUtils.isNull(menu.getId()) ? -1L : menu.getId();
+        QueryWrapper<SysMenu> query = new QueryWrapper<>();
+        query.eq("name", menu.getName());
+        query.eq("parent_id", menu.getParentId());
+        SysMenu info = menuMapper.selectOne(query);
+        if (StringUtils.isNotNull(info) && info.getId().longValue() != menuId.longValue())
+        {
+            return UserConstants.NOT_UNIQUE;
+        }
+        return UserConstants.UNIQUE;
     }
 
     /**
@@ -148,5 +240,154 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu> impl
             }
         }
         return permsSet;
+    }
+
+    /**
+     * 根据父节点的ID获取所有子节点
+     *
+     * @param list 分类表
+     * @param parentId 传入的父节点ID
+     * @return String
+     */
+    public List<SysMenu> getChildPerms(List<SysMenu> list, int parentId)
+    {
+        List<SysMenu> returnList = new ArrayList<SysMenu>();
+        Iterator<SysMenu> iterator = list.iterator();
+        while (iterator.hasNext()) {
+            SysMenu t = (SysMenu) iterator.next();
+            // 一、根据传入的某个父节点ID,遍历该父节点的所有子节点
+            if (t.getParentId() == parentId)
+            {
+                recursionFn(list, t);
+                returnList.add(t);
+            }
+        }
+        return returnList;
+    }
+
+    /**
+     * 递归列表
+     *
+     * @param list 菜单列表
+     * @param t 父菜单
+     */
+    private void recursionFn(List<SysMenu> list, SysMenu t)
+    {
+        // 得到子节点列表
+        List<SysMenu> childList = getChildList(list, t);
+        t.setChildren(childList);
+        for (SysMenu tChild : childList)
+        {
+            if (hasChild(list, tChild))
+            {
+                recursionFn(list, tChild);
+            }
+        }
+    }
+
+
+    /**
+     * 得到子节点列表
+     */
+    private List<SysMenu> getChildList(List<SysMenu> list, SysMenu t)
+    {
+        List<SysMenu> tlist = new ArrayList<SysMenu>();
+        for (SysMenu n : list) {
+            if (n.getParentId().longValue() == t.getId().longValue()) {
+                tlist.add(n);
+            }
+        }
+        return tlist;
+    }
+
+    /**
+     * 判断是否有子节点
+     */
+    private boolean hasChild(List<SysMenu> list, SysMenu t)
+    {
+        return getChildList(list, t).size() > 0;
+    }
+
+    /**
+     * 获取路由名称
+     *
+     * @param menu 菜单信息
+     * @return 路由名称
+     */
+    public String getRouteName(SysMenu menu)
+    {
+        String routerName = StringUtils.capitalize(menu.getPath());
+        // 非外链并且是一级目录（类型为目录）
+        if (isMeunFrame(menu))
+        {
+            routerName = StringUtils.EMPTY;
+        }
+        return routerName;
+    }
+
+    /**
+     * 获取路由地址
+     *
+     * @param menu 菜单信息
+     * @return 路由地址
+     */
+    public String getRouterPath(SysMenu menu)
+    {
+        String routerPath = menu.getPath();
+        // 非外链并且是一级目录（类型为目录）
+        if (0 == menu.getParentId().intValue() && UserConstants.TYPE_DIR.equals(menu.getMenuType())
+                && UserConstants.NO_FRAME.equals(menu.getIsFrame()))
+        {
+            routerPath = "/" + menu.getPath();
+        }
+        // 非外链并且是一级目录（类型为菜单）
+        else if (isMeunFrame(menu))
+        {
+            routerPath = "/";
+        }
+        return routerPath;
+    }
+
+    /**
+     * 获取组件信息
+     *
+     * @param menu 菜单信息
+     * @return 组件信息
+     */
+    public String getComponent(SysMenu menu)
+    {
+        String component = UserConstants.LAYOUT;
+        if (StringUtils.isNotEmpty(menu.getComponent()) && !isMeunFrame(menu))
+        {
+            component = menu.getComponent();
+        }
+        else if (StringUtils.isEmpty(menu.getComponent()) && isParentView(menu))
+        {
+            component = UserConstants.PARENT_VIEW;
+        }
+        return component;
+    }
+
+    /**
+     * 是否为菜单内部跳转
+     *
+     * @param menu 菜单信息
+     * @return 结果
+     */
+    public boolean isMeunFrame(SysMenu menu)
+    {
+        return menu.getParentId().intValue() == 0 && UserConstants.TYPE_MENU.equals(menu.getMenuType())
+                && menu.getIsFrame().equals(UserConstants.NO_FRAME);
+    }
+
+    /**
+     * 是否为parent_view组件
+     *
+     * @param menu 菜单信息
+     * @return 结果
+     */
+    public boolean isParentView(SysMenu menu)
+    {
+        return menu.getParentId().intValue() != 0 && UserConstants.TYPE_DIR.equals(menu.getMenuType());
     }
 }

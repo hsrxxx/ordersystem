@@ -1,29 +1,26 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 import { Message } from 'element-ui';
-import Index from '../layout/index'
-import Login from '../views/login'
-import Register from '../views/register'
+import Layout from '@/layout/index'
 import Product from '../views/system/product/index'
 import User from '../views/system/user/index'
 
 Vue.use(VueRouter)
 
-const routes = [
+export const constantRoutes = [
   {
     path: '/login',
-    name: '用户登陆',
-    component: Login,
+    component: (resolve) => require(['@/views/login'], resolve),
   },
   {
     path: '/register',
     name: '用户注册',
-    component: Register,
+    component: (resolve) => require(['@/views/register'], resolve),
   },
   {
-    path: '/',
+    path: '',
     name: '系统管理',
-    component: Index,
+    component: Layout,
     icon: 'el-icon-s-promotion',
     show: true,
     children: [
@@ -45,7 +42,8 @@ const router = new VueRouter({
   // history 模式下刷新404
   // mode: 'history',
   base: process.env.BASE_URL,
-  routes
+  scrollBehavior: () => ({ y: 0 }),
+  routes: constantRoutes
 })
 
 router.beforeEach((to, from, next) => {
@@ -58,7 +56,7 @@ router.beforeEach((to, from, next) => {
     let token = localStorage.getItem('token');
     if (token == null || token === '') {
       Message.error('请先登录用户')
-      next({name: '用户登陆'});
+      next({path: 'login'});
     } else {
       next();
     }

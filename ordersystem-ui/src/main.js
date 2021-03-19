@@ -4,12 +4,12 @@ import router from './router'
 import store from './store'
 import ElementUI from 'element-ui';
 import { Message } from 'element-ui';
+import { resetForm } from "@/utils/hsrxxx";
 import 'element-ui/lib/theme-chalk/index.css';
-import axios from 'axios';
 
 Vue.use(ElementUI);
 
-// 全局消息
+Vue.prototype.resetForm = resetForm
 Vue.prototype.$Message = Message
 
 Vue.config.productionTip = false

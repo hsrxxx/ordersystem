@@ -1,7 +1,10 @@
 package com.hsrxxx.controller;
 
 
+import com.hsrxxx.common.core.constant.Constants;
+import com.hsrxxx.common.core.constant.UserConstants;
 import com.hsrxxx.common.core.utils.SecurityUtils;
+import com.hsrxxx.common.core.utils.StringUtils;
 import com.hsrxxx.common.core.web.controller.BaseController;
 import com.hsrxxx.common.core.web.domain.AjaxResult;
 import com.hsrxxx.common.security.annotation.PreAuthorize;
@@ -33,7 +36,7 @@ public class SysMenuController extends BaseController {
      */
     @PreAuthorize(hasPermi = "system:menu:list")
     @GetMapping("/list")
-    public AjaxResult list(SysMenu menu)
+    public AjaxResult list()
     {
         Long userId = SecurityUtils.getUserId();
         List<SysMenu> menus = menuService.selectMenuList(userId);
@@ -47,17 +50,17 @@ public class SysMenuController extends BaseController {
     @GetMapping(value = "/{menuId}")
     public AjaxResult getInfo(@PathVariable Long menuId)
     {
-        return AjaxResult.success(menuService.selectMenuById(menuId));
+        return AjaxResult.success(menuService.getById(menuId));
     }
 
     /**
      * 获取菜单下拉树列表
      */
     @GetMapping("/treeselect")
-    public AjaxResult treeselect(SysMenu menu)
+    public AjaxResult treeselect()
     {
         Long userId = SecurityUtils.getUserId();
-        List<SysMenu> menus = menuService.selectMenuList(menu, userId);
+        List<SysMenu> menus = menuService.selectMenuList(userId);
         return AjaxResult.success(menuService.buildMenuTreeSelect(menus));
     }
 
@@ -79,53 +82,50 @@ public class SysMenuController extends BaseController {
      * 新增菜单
      */
     @PreAuthorize(hasPermi = "system:menu:add")
-    @Log(title = "菜单管理", businessType = BusinessType.INSERT)
     @PostMapping
     public AjaxResult add(@Validated @RequestBody SysMenu menu)
     {
         if (UserConstants.NOT_UNIQUE.equals(menuService.checkMenuNameUnique(menu)))
         {
-            return AjaxResult.error("新增菜单'" + menu.getMenuName() + "'失败，菜单名称已存在");
+            return AjaxResult.error("新增菜单'" + menu.getName() + "'失败，菜单名称已存在");
         }
         else if (UserConstants.YES_FRAME.equals(menu.getIsFrame())
                 && !StringUtils.startsWithAny(menu.getPath(), Constants.HTTP, Constants.HTTPS))
         {
-            return AjaxResult.error("新增菜单'" + menu.getMenuName() + "'失败，地址必须以http(s)://开头");
+            return AjaxResult.error("新增菜单'" + menu.getName() + "'失败，地址必须以http(s)://开头");
         }
         menu.setCreateBy(SecurityUtils.getUsername());
-        return toAjax(menuService.insertMenu(menu));
+        return toAjax(menuService.save(menu));
     }
 
     /**
      * 修改菜单
      */
     @PreAuthorize(hasPermi = "system:menu:edit")
-    @Log(title = "菜单管理", businessType = BusinessType.UPDATE)
     @PutMapping
     public AjaxResult edit(@Validated @RequestBody SysMenu menu)
     {
         if (UserConstants.NOT_UNIQUE.equals(menuService.checkMenuNameUnique(menu)))
         {
-            return AjaxResult.error("修改菜单'" + menu.getMenuName() + "'失败，菜单名称已存在");
+            return AjaxResult.error("修改菜单'" + menu.getName() + "'失败，菜单名称已存在");
         }
         else if (UserConstants.YES_FRAME.equals(menu.getIsFrame())
                 && !StringUtils.startsWithAny(menu.getPath(), Constants.HTTP, Constants.HTTPS))
         {
-            return AjaxResult.error("修改菜单'" + menu.getMenuName() + "'失败，地址必须以http(s)://开头");
+            return AjaxResult.error("修改菜单'" + menu.getName() + "'失败，地址必须以http(s)://开头");
         }
-        else if (menu.getMenuId().equals(menu.getParentId()))
+        else if (menu.getId().equals(menu.getParentId()))
         {
-            return AjaxResult.error("修改菜单'" + menu.getMenuName() + "'失败，上级菜单不能选择自己");
+            return AjaxResult.error("修改菜单'" + menu.getName() + "'失败，上级菜单不能选择自己");
         }
         menu.setUpdateBy(SecurityUtils.getUsername());
-        return toAjax(menuService.updateMenu(menu));
+        return toAjax(menuService.updateById(menu));
     }
 
     /**
      * 删除菜单
      */
     @PreAuthorize(hasPermi = "system:menu:remove")
-    @Log(title = "菜单管理", businessType = BusinessType.DELETE)
     @DeleteMapping("/{menuId}")
     public AjaxResult remove(@PathVariable("menuId") Long menuId)
     {
@@ -137,7 +137,7 @@ public class SysMenuController extends BaseController {
         {
             return AjaxResult.error("菜单已分配,不允许删除");
         }
-        return toAjax(menuService.deleteMenuById(menuId));
+        return toAjax(menuService.removeById(menuId));
     }
 
     /**

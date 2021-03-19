@@ -16,7 +16,7 @@ import java.util.Set;
  * @author 松仁
  * @since 2021-03-08
  */
-interface SysMenuService extends IService<SysMenu> {
+public interface SysMenuService extends IService<SysMenu> {
 
     /**
      * 根据用户查询系统菜单列表
@@ -75,14 +75,6 @@ interface SysMenuService extends IService<SysMenu> {
     List<TreeSelect> buildMenuTreeSelect(List<SysMenu> menus);
 
     /**
-     * 根据菜单ID查询信息
-     *
-     * @param menuId 菜单ID
-     * @return 菜单信息
-     */
-    SysMenu selectMenuById(Long menuId);
-
-    /**
      * 是否存在菜单子节点
      *
      * @param menuId 菜单ID
@@ -97,30 +89,6 @@ interface SysMenuService extends IService<SysMenu> {
      * @return 结果 true 存在 false 不存在
      */
     boolean checkMenuExistRole(Long menuId);
-
-    /**
-     * 新增保存菜单信息
-     *
-     * @param menu 菜单信息
-     * @return 结果
-     */
-    int insertMenu(SysMenu menu);
-
-    /**
-     * 修改保存菜单信息
-     *
-     * @param menu 菜单信息
-     * @return 结果
-     */
-    int updateMenu(SysMenu menu);
-
-    /**
-     * 删除菜单管理信息
-     *
-     * @param menuId 菜单ID
-     * @return 结果
-     */
-    int deleteMenuById(Long menuId);
 
     /**
      * 校验菜单名称是否唯一

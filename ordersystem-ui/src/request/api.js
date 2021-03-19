@@ -66,6 +66,12 @@ export const userList = (data) => qsget('/system/user/list', data);
 export const userQuery = (id) => get(`/system/user/${id}`);
 
 /**
+ * 获取角色信息
+ * @returns { Promise<unknown> }
+ */
+export const getInfo = () => get('/system/user/');
+
+/**
  * 通过 data 对象保存 user, id 为空
  * @param { Object } data = { id: ..., username: ..., nickname: ..., email: ..., telephone: ..., sex: ..., address: ..., remark: ..., status: ... }
  * @returns {Promise<unknown>}
@@ -90,7 +96,7 @@ export const userRemove = (data) => qsdeletefn(`/system/user`, data);
  * 通过 headers 内的 token 获取用户信息
  * @returns {Promise<unknown>}
  */
-export const userGetInfo = () => get('/system/user/getInfo');
+export const getUserInfo = () => get('/system/user/getInfo');
 
 /**
  * 通过 data 对象修改 用户密码, id 不为空
@@ -112,3 +118,13 @@ export const changeStatus = (data) => put('/system/user/changeStatus', data);
  * @returns {Promise<unknown>}
  */
 export const login = (data) => qspost('/oauth/oauth/token', data);
+
+// ---------------------------------------------------------------------------------------------------------------------
+// menu.vue api
+
+/**
+ * 获取前端路由信息
+ * @param data
+ * @returns {Promise<unknown>}
+ */
+export const getRouters = () => get('/menu/getRouters');

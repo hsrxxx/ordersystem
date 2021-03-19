@@ -23,6 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -81,7 +82,11 @@ public class SysUserController extends BaseController {
             QueryWrapper<SysUserRole> queryWrapper = new QueryWrapper<>();
             queryWrapper.eq("user_id",userId);
             // 根据用户id获取角色列表
-            ajax.put("roleId", userRoleService.getOne(queryWrapper).getRoleId());
+            List<Long> roleList = new ArrayList<>();
+            for (SysUserRole userRole:userRoleService.list(queryWrapper)) {
+                roleList.add(userRole.getRoleId());
+            }
+            ajax.put("roleIds", roleList);
         }
         return ajax;
     }
