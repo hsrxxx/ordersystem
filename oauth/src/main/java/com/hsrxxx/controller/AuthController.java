@@ -3,6 +3,7 @@ package com.hsrxxx.controller;
 import com.hsrxxx.common.core.constant.HttpStatus;
 import com.hsrxxx.common.core.domain.R;
 import com.hsrxxx.common.core.exception.CustomException;
+import com.hsrxxx.common.core.utils.StringUtils;
 import com.hsrxxx.common.security.service.TokenService;
 import com.hsrxxx.service.SysLoginService;
 import com.hsrxxx.system.api.modules.LoginUser;
@@ -12,6 +13,7 @@ import org.springframework.security.oauth2.provider.endpoint.TokenEndpoint;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.security.Principal;
 import java.util.Map;
 
@@ -55,4 +57,31 @@ public class AuthController {
         return R.fail(HttpStatus.FORBIDDEN, "授权类型无效");
     }
 
+    @DeleteMapping("logout")
+    public R<?> logout(HttpServletRequest request)
+    {
+        LoginUser loginUser = tokenService.getLoginUser(request);
+        if (StringUtils.isNotNull(loginUser))
+        {
+//            String username = loginUser.getUsername();
+            // 删除用户缓存记录
+            tokenService.delLoginUser(loginUser.getToken());
+//            // 记录用户退出日志
+//            sysLoginService.logout(username);
+        }
+        return R.ok();
+    }
+
+    @PostMapping("refresh")
+    public R<?> refresh(HttpServletRequest request)
+    {
+        LoginUser loginUser = tokenService.getLoginUser(request);
+        if (StringUtils.isNotNull(loginUser))
+        {
+            // 刷新令牌有效期
+            tokenService.refreshToken(loginUser);
+            return R.ok();
+        }
+        return R.ok();
+    }
 }

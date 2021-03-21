@@ -24,11 +24,21 @@ public class SysProductServiceImpl extends ServiceImpl<SysProductMapper, SysProd
     SysProductMapper productMapper;
 
 
+    /**
+     * 获取全部产品的详情信息
+     *
+     * @return List<SysProduct>
+     */
     @Override
     public List<SysProduct> selectProductList() {
         return productMapper.selectProductList();
     }
 
+    /**
+     * 根据 id 获取产品的详情信息
+     * @param id 产品id
+     * @return SysProduct
+     */
     @Override
     public SysProduct selectProductById(Long id) {
         return productMapper.selectProductById(id);

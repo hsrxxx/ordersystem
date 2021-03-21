@@ -1,4 +1,4 @@
-import { login, logout, getInfo, refreshToken } from '@/api/login'
+import { login, getInfo, logout, refreshToken } from '@/api/login'
 import { getToken, setToken, setExpiresIn, removeToken } from '@/utils/auth'
 
 const user = {
@@ -34,15 +34,12 @@ const user = {
   actions: {
     // 登录
     Login({ commit }, userInfo) {
-      const username = userInfo.username.trim()
-      const password = userInfo.password
-      const code = userInfo.code
-      const uuid = userInfo.uuid
+      userInfo.username = userInfo.username.trim()
       return new Promise((resolve, reject) => {
-        login(username, password, code, uuid).then(res => {
+        login(userInfo).then(res => {
           let data = res.data
-          setToken(data.access_token)
-          commit('SET_TOKEN', data.access_token)
+          setToken(data.token)
+          commit('SET_TOKEN', data.token)
           setExpiresIn(data.expires_in)
           commit('SET_EXPIRES_IN', data.expires_in)
           resolve()

@@ -1,23 +1,17 @@
-// import Vue from 'vue'
-// import Vuex from 'vuex'
-// import app from './modules/app'
-// import user from './modules/user'
-// import tagsView from './modules/tagsView'
-// import permission from './modules/permission'
-// import settings from './modules/settings'
-// import getters from './getters'
-//
-// Vue.use(Vuex)
-//
-// const store = new Vuex.Store({
-//   modules: {
-//     app,
-//     user,
-//     tagsView,
-//     permission,
-//     settings
-//   },
-//   getters
-// })
-//
-// export default store
+import Vue from 'vue'
+import Vuex from 'vuex'
+import user from './modules/user'
+import permission from './modules/permission'
+import getters from './getters'
+
+Vue.use(Vuex)
+
+const store = new Vuex.Store({
+  modules: {
+    user,
+    permission,
+  },
+  getters
+})
+
+export default store

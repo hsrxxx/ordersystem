@@ -3,6 +3,7 @@ package com.hsrxxx.service;
 import java.util.Set;
 
 public interface SysPermissionService {
+
     /**
      * 获取角色数据权限
      * 

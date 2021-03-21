@@ -8,7 +8,9 @@ import com.hsrxxx.common.core.web.domain.AjaxResult;
 import com.hsrxxx.common.core.web.page.TableDataInfo;
 import com.hsrxxx.common.security.annotation.PreAuthorize;
 import com.hsrxxx.entity.SysProduct;
+import com.hsrxxx.entity.SysType;
 import com.hsrxxx.service.SysProductService;
+import com.hsrxxx.service.SysTypeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -31,6 +33,9 @@ public class SysProductController extends BaseController {
     @Autowired
     private SysProductService productService;
 
+    @Autowired
+    private SysTypeService typeService;
+
     /**
      * 获取产品列表
      */
@@ -46,11 +51,14 @@ public class SysProductController extends BaseController {
      * 根据产品编号获取详细信息
      */
     @PreAuthorize(hasPermi = "system:product:query")
-    @GetMapping("/{productId}")
-    public AjaxResult query(@PathVariable("productId") Long productId){
+    @GetMapping({"/", "/{productId}"})
+    public AjaxResult query(@PathVariable(value = "productId", required = false) Long productId){
         // 请求成功
         AjaxResult ajax =AjaxResult.success();
-        ajax.put(AjaxResult.DATA_TAG, productService.selectProductById(productId));
+        ajax.put("types", typeService.list());
+        if (StringUtils.isNotNull(productId)){
+            ajax.put(AjaxResult.DATA_TAG, productService.selectProductById(productId));
+        }
         return ajax;
     }
 

@@ -47,7 +47,7 @@ public class Main {
 
         // new 包配置对象
         PackageConfig packageConfig = new PackageConfig();
-        packageConfig.setParent("com.hsrxxx");
+        packageConfig.setParent("com.hsrxxx.test");
         packageConfig.setEntity("entity");
         packageConfig.setMapper("mapper");
         packageConfig.setController("controller");

@@ -27,6 +27,12 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> impl
     @Autowired
     private SysRoleMapper roleMapper;
 
+    /**
+     * 根据用户ID查询角色
+     *
+     * @param userId 用户ID
+     * @return 权限列表
+     */
     @Override
     public Set<String> selectRolePermissionByUserId(Long userId) {
         List<SysRole> perms = roleMapper.selectRolePermissionByUserId(userId);

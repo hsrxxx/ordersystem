@@ -4,8 +4,9 @@
  */
 import axios from 'axios';
 import QS from 'qs';
-import { Message, Loading } from 'element-ui';
-import store from '../store/index'
+import { Message, Loading, Notification, MessageBox } from 'element-ui';
+import { getToken } from '@/utils/auth'
+import store from '../store'
 import router from "vue-router";
  
 let loadinginstace
@@ -31,10 +32,10 @@ axios.interceptors.request.use(
         // if (localStorage.getItem('token')) {
         //     config.headers.Authorization = 'Bearer ' + localStorage.getItem('token');
         // }
-        (localStorage.getItem('token')) && (config.headers.Authorization = 'Bearer ' + localStorage.getItem('token'))
+        (getToken()) && (config.headers.Authorization = 'Bearer ' + getToken())
         // 请求时加载element ui loading 组件
-        let domId = '#' + config.url.split('/')[1]
-        if (config.url.toString().indexOf('findById') != -1){
+        let domId = '#' + config.url.split('/')[2]
+        if (config.url.toString().indexOf('query') != -1){
             domId = '#form'
         }
         if (loadinginstace){
@@ -68,19 +69,27 @@ axios.interceptors.request.use(
 axios.interceptors.response.use(    
     response => {
         loadinginstace && loadinginstace.close()
-        if (response.data.code === 200){
-            // Message.success(response.data.msg)
-            return Promise.resolve(response);
-        } else if (response.data.code === 401){
-            Message.error(response.data.msg)
-            localStorage.removeItem('token');
-            return Promise.reject(response);
-        } else if (response.data.code === 403){
-            Message.error(response.data.msg)
-            return Promise.reject(response);
+        if (response.data.code === 401){
+            MessageBox.confirm('登录状态已过期，您可以继续留在该页面，或者重新登录', '系统提示', {
+                    confirmButtonText: '重新登录',
+                    cancelButtonText: '取消',
+                    type: 'warning'
+                }
+            ).then(() => {
+                store.dispatch('LogOut').then(() => {
+                    location.href = '/index';
+                })
+            })
         } else if (response.data.code === 500){
             Message.error(response.data.msg)
-            return Promise.reject(response);
+            return Promise.reject(response.data.msg);
+        } else if (response.data.code !== 200){
+            Notification.error({
+                title: response.data.msg
+            })
+            return Promise.resolve(response.data.msg);
+        } else {
+            return Promise.resolve(response);
         }
     },
     error => {

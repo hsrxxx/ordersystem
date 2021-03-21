@@ -1,5 +1,5 @@
 import { constantRoutes } from '@/router'
-import { getRouters } from '@/request/api'
+import { getRouters } from '@/api/menu'
 import Layout from '@/layout/index'
 import ParentView from '@/components/ParentView';
 
@@ -48,6 +48,7 @@ function filterAsyncRouter(asyncRouterMap, lastRouter = false, type = false) {
       // Layout ParentView 组件特殊处理
       if (route.component === 'Layout') {
         route.component = Layout
+        route.path = '/' + route.path
       } else if (route.component === 'ParentView') {
         route.component = ParentView
       } else {

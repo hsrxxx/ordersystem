@@ -10,6 +10,7 @@
             <el-col :span="1.5">
                 <el-button type="danger" plain size="small" icon="el-icon-delete" :disabled="removeDisabled" @click="handleRemove(multipleSelection)">删除</el-button>
             </el-col>
+            <right-toolbar @queryTable="getList(1,10)"></right-toolbar>
         </el-row>
         
         <el-dialog title="新增用户" :visible.sync="dialogFormVisible" width="40%" :showClose="false" :close-on-click-modal="false">
@@ -43,10 +44,10 @@
                         <el-form-item label="性别" prop="sex">
                             <el-select v-model="form.sex" placeholder="请选择">
                                 <el-option
-                                        v-for="item in sex"
-                                        :key="item.value"
-                                        :label="item.label"
-                                        :value="item.value" />
+                                        v-for="item in sexOptions"
+                                        :key="item.dictValue"
+                                        :label="item.dictLabel"
+                                        :value="item.dictValue" />
                             </el-select>
                         </el-form-item>
                     </el-col>
@@ -62,10 +63,10 @@
                         <el-form-item label="状态" prop="status">
                             <el-select v-model="form.status" placeholder="请选择">
                                 <el-option
-                                        v-for="item in status"
-                                        :key="item.value"
-                                        :label="item.label"
-                                        :value="item.value" />
+                                        v-for="item in statusOptions"
+                                        :key="item.dictValue"
+                                        :label="item.dictLabel"
+                                        :value="item.dictValue" />
                             </el-select>
                         </el-form-item>
                     </el-col>
@@ -101,7 +102,7 @@
         <el-table
             id="user"
             ref="multipleTable"
-            :data="tableData"
+            :data="userList"
             :header-cell-style="{ background:'#f8f8f9' }"
             style="margin-top:20px"
             @selection-change="handleSelectionChange">
@@ -115,12 +116,12 @@
             <el-table-column
                 fixed="right"
                 label="操作"
-                width="100" 
                 header-align="center"
-                align="center">
+                align="center"
+                class-name="small-padding fixed-width">
                 <template slot-scope="scope">
-                    <el-button @click="handleRemove(scope.row)" type="text" size="small">删除</el-button>
-                    <el-button @click="handleEdit(scope.row)" type="text" size="small">修改</el-button>
+                    <el-button @click="handleEdit(scope.row)" type="text" size="small"  icon="el-icon-edit">修改</el-button>
+                    <el-button @click="handleRemove(scope.row)" type="text" size="small" icon="el-icon-delete">删除</el-button>
                 </template>
             </el-table-column>
         </el-table>
@@ -139,13 +140,13 @@
 
 <script>
 
-    import { userList, userQuery, userAdd, userEdit, userRemove, getInfo, userGetInfo, resetPwd, changeStatus } from '@/request/api'
+    import { listUser, queryUser, addUser, editUser, removeUser, getRoles } from '@/api/system/user'
 
     export default {
         name: 'OrderSystemUser',
         data() {
             return {
-                tableData: [],
+                userList: [],
                 count: 0,
                 index: 1,
                 limit: 10,
@@ -154,26 +155,10 @@
                 removeDisabled: true,
                 dialogFormVisible: false,
                 addLoading: false,
-                sex: [
-                    {
-                        value: '0',
-                        label: '男'
-                    },
-                    {
-                        value: '1',
-                        label: '女'
-                    }
-                ],
-                status: [
-                    {
-                        value: '0',
-                        label: '正常'
-                    },
-                    {
-                        value: '1',
-                        label: '停用'
-                    }
-                ],
+                // 用户性别数据字典
+                sexOptions: [],
+                // 用户状态数据字典
+                statusOptions: [],
                 form: {},
                 rules: {
                     username: [
@@ -203,7 +188,6 @@
                         }
                     ]
                 },
-                options: [],
                 pageDomain:{
                     pageNum: undefined,
                     pageSize: undefined,
@@ -214,43 +198,38 @@
             }
         },
         created() {
-            this.userList(1, 10)
+            this.getList(1, 10)
+            this.getDicts("sys_user_sex").then(response => {
+                this.sexOptions = response.data;
+            });
+            this.getDicts("sys_normal_disable").then(response => {
+                this.statusOptions = response.data;
+            });
         },
         methods: {
-            userList(index, limit, orderByColumn, isAsc){
+            getList(index, limit, orderByColumn, isAsc){
                 this.pageDomain.pageNum = index
                 this.pageDomain.pageSize = limit
-                userList(this.pageDomain)
+                listUser(this.pageDomain)
                     .then( res => {
-                        this.tableData = res.rows
+                        this.userList = res.rows
                         this.count = res.total
                     })
             },
             addOrEditUser(){
-                let data = {
-                    id: this.form.id,
-                    username: this.form.username,
-                    nickname: this.form.nickname,
-                    password: this.form.password,
-                    email: this.form.email,
-                    telephone: this.form.telephone,
-                    sex: this.form.sex,
-                    address: this.form.address,
-                    status: this.form.status,
-                    remark: this.form.remark,
-                    roleIds: this.form.roleIds,
-                }
+                let data = this.form
+
                 this.addLoading = true
 
                 if(data.id === undefined){
-                    userAdd(data).then(res => {
+                    addUser(data).then(res => {
                         this.$Message.success('用户' + data.username + '添加成功')
-                        this.userList(this.index, this.limit)
+                        this.getList(this.index, this.limit)
                     })
                 }else{
-                    userEdit(data).then(res => {
+                    editUser(data).then(res => {
                         this.$Message.success('用户' + data.username + '修改成功')
-                        this.userList(this.index, this.limit)
+                        this.getList(this.index, this.limit)
                     })
                 }
 
@@ -296,15 +275,15 @@
                 let params = {
                     userIds: ids
                 }
-                userRemove(params).then(res => {
+                removeUser(params).then(res => {
                     this.$Message.success("删除成功!")
-                    this.userList(this.index, this.limit)
+                    this.getList(this.index, this.limit)
                 })
             },
             handleEdit(row) {
                 this.reset()
                 this.dialogFormVisible = true
-                userQuery(row.id).then(res => {
+                queryUser(row.id).then(res => {
                     // this.form = res
                     this.form = {
                         id: res.data.id,
@@ -325,7 +304,7 @@
             handleAdd(){
                 this.reset()
                 this.dialogFormVisible = true
-                getInfo().then(res => {
+                getRoles().then(res => {
                     this.roleOptions = res.roles
                 })
             },
@@ -337,12 +316,12 @@
                     this.index = Math.ceil(this.count / val)
                 }
                 this.limit = val
-                this.userList(this.index, this.limit)
+                this.getList(this.index, this.limit)
             },
             // 修改第几页
             handleCurrentChange(val) {
                 this.index = val
-                this.userList(this.index, this.limit)
+                this.getList(this.index, this.limit)
             },
 
             // 多选

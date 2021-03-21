@@ -1,6 +1,5 @@
 package com.hsrxxx.service.impl;
 
-import com.hsrxxx.entity.SysUser;
 import com.hsrxxx.service.SysMenuService;
 import com.hsrxxx.service.SysPermissionService;
 import com.hsrxxx.service.SysRoleService;
@@ -25,6 +24,12 @@ public class SysPermissionServiceImpl implements SysPermissionService {
     @Autowired
     private SysMenuService menuService;
 
+    /**
+     * 获取角色数据权限
+     *
+     * @param userId 用户Id
+     * @return 角色权限信息
+     */
     @Override
     public Set<String> getRolePermission(Long userId) {
 
@@ -41,6 +46,12 @@ public class SysPermissionServiceImpl implements SysPermissionService {
         return roles;
     }
 
+    /**
+     * 获取菜单数据权限
+     *
+     * @param userId 用户Id
+     * @return 菜单权限信息
+     */
     @Override
     public Set<String> getMenuPermission(Long userId) {
         Set<String> perms = new HashSet<String>();

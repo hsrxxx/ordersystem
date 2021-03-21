@@ -29,8 +29,10 @@ public class RestAuthenticationEntryPoint implements ServerAuthenticationEntryPo
         String body = null;
         if ("Not Authenticated".equals(e.getMessage())){
             body = JSONUtil.toJsonStr(AjaxResult.error(401, "令牌不能为空"));
-        }else if (e.getMessage().contains("Jwt expired")){
+        } else if (e.getMessage().contains("Jwt expired")){
             body = JSONUtil.toJsonStr(AjaxResult.error(401, "登录状态已过期"));
+        } else if ("Unsupported algorithm of HS512".equals(e.getMessage())){
+            body = JSONUtil.toJsonStr(AjaxResult.error(401, "令牌验证失败"));
         }
         DataBuffer buffer =  response.bufferFactory().wrap(body.getBytes(StandardCharsets.UTF_8));
         return response.writeWith(Mono.just(buffer));

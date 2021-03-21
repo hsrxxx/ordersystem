@@ -40,6 +40,12 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
     private SysRoleMapper roleMapper;
 
 
+    /**
+     * 获取用户角色数据
+     *
+     * @param username 用户名
+     * @return 用户角色信息
+     */
     @Override
     public UserRoleVO getUserRoleByUsername(String username) {
         UserRoleVO userRoleVO = new UserRoleVO();
@@ -67,6 +73,11 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
         return userRoleVO;
     }
 
+    /**
+     * 校验用户是否允许操作
+     *
+     * @param user 用户信息
+     */
     @Override
     public void checkUserAllowed(SysUser user) {
         if (StringUtils.isNotNull(user.getId()) && user.isAdmin())
@@ -75,16 +86,34 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
         }
     }
 
+    /**
+     * 重置用户密码
+     *
+     * @param user 用户信息
+     * @return 结果
+     */
     @Override
     public int resetPwd(SysUser user) {
         return userMapper.updateById(user);
     }
 
+    /**
+     * 修改用户状态
+     *
+     * @param user 用户信息
+     * @return 结果
+     */
     @Override
     public int updateUserStatus(SysUser user) {
         return userMapper.updateById(user);
     }
 
+    /**
+     * 校验用户名称是否唯一
+     *
+     * @param user 用户信息
+     * @return 结果
+     */
     @Override
     public String checkUserNameUnique(SysUser user) {
         Long userId = StringUtils.isNull(user.getId()) ? -1L : user.getId();
@@ -98,6 +127,12 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
         return UserConstants.UNIQUE;
     }
 
+    /**
+     * 校验手机号码是否唯一
+     *
+     * @param user 用户信息
+     * @return 结果
+     */
     @Override
     public String checkTelephoneUnique(SysUser user) {
         Long userId = StringUtils.isNull(user.getId()) ? -1L : user.getId();
@@ -111,6 +146,12 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
         return UserConstants.UNIQUE;
     }
 
+    /**
+     * 校验email是否唯一
+     *
+     * @param user 用户信息
+     * @return 结果
+     */
     @Override
     public String checkEmailUnique(SysUser user) {
         Long userId = StringUtils.isNull(user.getId()) ? -1L : user.getId();
@@ -124,6 +165,11 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
         return UserConstants.UNIQUE;
     }
 
+    /**
+     * 更新用户信息
+     * @param user
+     * @return
+     */
     @Override
     public int updateUser(SysUser user) {
         QueryWrapper<SysUserRole> query = new QueryWrapper<>();
@@ -133,6 +179,11 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
         return userMapper.updateById(user);
     }
 
+    /**
+     * 新增用户信息
+     * @param user
+     * @return
+     */
     @Override
     public int insertUser(SysUser user) {
         int rows = userMapper.insert(user);
@@ -141,6 +192,11 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
         return rows;
     }
 
+    /**
+     * 新增角色信息
+     * @param user
+     * @return
+     */
     @Override
     public void insertRole(SysUser user) {
         Long[] roleIds = user.getRoleIds();

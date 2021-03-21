@@ -22,9 +22,9 @@ secure:
     urls: #配置白名单路径
       - "/actuator/**"
       - "/oauth/oauth/token"
-      - "/oauth/login"
-      - "/oauth/logout"
-      - "/oauth/refresh"
+#      - "/oauth/login"
+#      - "/oauth/logout"
+#      - "/oauth/refresh"
 #      - "/**"
 #      - "/client/product/index"
 #      - "/client/product/count"
