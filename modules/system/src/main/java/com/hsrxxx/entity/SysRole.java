@@ -7,8 +7,11 @@ import com.baomidou.mybatisplus.annotation.FieldFill;
 import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.baomidou.mybatisplus.annotation.TableField;
 import java.io.Serializable;
+
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
 /**
@@ -20,8 +23,8 @@ import lombok.experimental.Accessors;
  * @since 2021-03-08
  */
 @Data
-  @EqualsAndHashCode(callSuper = false)
-  @Accessors(chain = true)
+@EqualsAndHashCode(callSuper = false)
+@Accessors(chain = true)
 public class SysRole implements Serializable {
 
     private static final long serialVersionUID=1L;
@@ -35,6 +38,9 @@ public class SysRole implements Serializable {
 
     private String createBy;
 
+    /** 菜单树选择项是否关联显示（ 0：父子不互相关联显示 1：父子互相关联显示） */
+    private boolean menuCheckStrictly;
+
       @TableField(fill = FieldFill.INSERT)
       private LocalDateTime createTime;
 
@@ -43,10 +49,26 @@ public class SysRole implements Serializable {
       @TableField(fill = FieldFill.INSERT_UPDATE)
       private LocalDateTime updateTime;
 
+    private String status;
+
     private String remark;
 
     @TableLogic
     private String delFlag;
+
+    /** 菜单组 */
+    @TableField(exist = false)
+    private Long[] menuIds;
+
+    public SysRole()
+    {
+
+    }
+
+    public SysRole(Long roleId)
+    {
+        this.id = roleId;
+    }
 
     public boolean isAdmin()
     {

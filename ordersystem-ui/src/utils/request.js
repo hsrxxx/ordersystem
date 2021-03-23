@@ -5,7 +5,7 @@
 import axios from 'axios';
 import QS from 'qs';
 import { Message, Loading, Notification, MessageBox } from 'element-ui';
-import { getToken } from '@/utils/auth'
+import { getToken, removeToken } from '@/utils/auth'
 import store from '../store'
 import router from "vue-router";
  
@@ -70,18 +70,19 @@ axios.interceptors.response.use(
     response => {
         loadinginstace && loadinginstace.close()
         if (response.data.code === 401){
-            MessageBox.confirm('登录状态已过期，您可以继续留在该页面，或者重新登录', '系统提示', {
-                    confirmButtonText: '重新登录',
-                    cancelButtonText: '取消',
-                    type: 'warning'
-                }
-            ).then(() => {
-                store.dispatch('LogOut').then(() => {
-                    location.href = '/index';
-                })
+            Message.error(response.data.msg)
+            store.dispatch('LogOut').then(() => {
+                router.push('login')
             })
         } else if (response.data.code === 500){
             Message.error(response.data.msg)
+            if (response.data.msg === '令牌不能为空'){
+                router.push('login')
+            } else if (response.data.msg === '登录状态已过期'){
+                router.push('login')
+            } else if (response.data.msg === '令牌验证失败'){
+                router.push('login')
+            }
             return Promise.reject(response.data.msg);
         } else if (response.data.code !== 200){
             Notification.error({
@@ -97,50 +98,51 @@ axios.interceptors.response.use(
         return Promise.reject(error.response);
     },
     // 服务器状态码不是200的情况
-    // error => {
-    //     loadinginstace.close()
-        // if (error.response.status) {
-        //     switch (error.response.data.code) {
-        //         // 401: 未登录
-        //         // 未登录则跳转登录页面，并携带当前页面的路径
-        //         // 在登录成功后返回当前页面，这一步需要在登录页操作。
-        //         case 500:
-        //             Message('登录过期，请重新登录')
-        //             router.replace({
-        //                 path: '/login',
-        //                 query: { redirect: router.currentRoute.fullPath }
-        //             });
-        //             break;
-        //         // 403 token过期
-        //         // 登录过期对用户进行提示
-        //         // 清除本地token和清空vuex中token对象
-        //         // 跳转登录页面
-        //         case 403:
-        //             Message('登录过期，请重新登录')
-        //             // 清除token
-        //             localStorage.removeItem('token');
-        //             store.commit('loginSuccess', null);
-        //             // 跳转登录页面，并将要浏览的页面fullPath传过去，登录成功后跳转需要访问的页面
-        //             setTimeout(() => {
-        //                 router.replace({
-        //                     path: '/login',
-        //                     query: {
-        //                         redirect: router.currentRoute.fullPath
-        //                     }
-        //                 });
-        //             }, 1000);
-        //             break;
-        //         // 404请求不存在
-        //         case 404:
-        //             Message('网络请求不存在');
-        //         break;
-        //         // 其他错误，直接抛出错误提示
-        //         default:
-        //             Message(error.response.data.message)
-        //     }
-        //     return Promise.reject(error.response);
-        // }
-    // }
+    error => {
+        loadinginstace.close()
+        console.log(error)
+        if (error.response.status) {
+            switch (error.response.data.code) {
+                // 401: 未登录
+                // 未登录则跳转登录页面，并携带当前页面的路径
+                // 在登录成功后返回当前页面，这一步需要在登录页操作。
+                case 500:
+                    Message('登录过期，请重新登录')
+                    router.replace({
+                        path: '/login',
+                        query: { redirect: router.currentRoute.fullPath }
+                    });
+                    break;
+                // 403 token过期
+                // 登录过期对用户进行提示
+                // 清除本地token和清空vuex中token对象
+                // 跳转登录页面
+                case 403:
+                    Message('登录过期，请重新登录')
+                    // 清除token
+                    localStorage.removeItem('token');
+                    store.commit('loginSuccess', null);
+                    // 跳转登录页面，并将要浏览的页面fullPath传过去，登录成功后跳转需要访问的页面
+                    setTimeout(() => {
+                        router.replace({
+                            path: '/login',
+                            query: {
+                                redirect: router.currentRoute.fullPath
+                            }
+                        });
+                    }, 1000);
+                    break;
+                // 404请求不存在
+                case 404:
+                    Message('网络请求不存在');
+                break;
+                // 其他错误，直接抛出错误提示
+                default:
+                    Message(error.response.data.message)
+            }
+            return Promise.reject(error.response);
+        }
+    }
 );
 
 /** 

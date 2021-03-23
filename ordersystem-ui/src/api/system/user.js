@@ -5,7 +5,7 @@ import { get, post, put, qsdeletefn, qsget } from "@/utils/request";
  * @param { Object } data 分页信息
  * @returns { Promise<unknown> }
  */
-export const listUser = (data) => qsget('/system/user/list', data);
+export const listUser = (data) => get('/system/user/list', data);
 
 /**
  * 通过 id 获取 user

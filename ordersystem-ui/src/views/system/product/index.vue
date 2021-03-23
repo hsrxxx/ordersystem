@@ -13,11 +13,11 @@
             <right-toolbar @queryTable="getList(1,10)"></right-toolbar>
         </el-row>
 
-        <el-table 
+        <el-table
             id="product"
             ref="multipleTable"
-            :data="productList" 
-            :header-cell-style="{background:'#f8f8f9'}" 
+            :data="productList"
+            :header-cell-style="{background:'#f8f8f9'}"
             style="margin-top:20px"
             @selection-change="handleSelectionChange">
             <el-table-column type="selection" width="55" />
@@ -88,7 +88,7 @@
     import { listProduct, queryProduct, addProduct, editProduct, removeProduct, getTypes } from '@/api/system/product'
 
     export default {
-        name: 'OrderSystemProduct',
+        name: 'Product',
         data() {
             return {
                 productList: [],
@@ -119,7 +119,7 @@
                         { required: true, message: "分类不能为空", trigger: "blur" }
                     ]
                 },
-                typeOptions: [],
+                statusOptions: [],
                 pageDomain:{
                     pageNum: this.index,
                     pageSize: this.limit,
@@ -129,37 +129,15 @@
             }
         },
         created() {
-            this.getList(1, 10)
+            this.getList()
         },
         methods: {
-            getList(index, limit, orderByColumn, isAsc){
-                this.pageDomain.pageNum = index
-                this.pageDomain.pageSize = limit
+            getList(){
                 listProduct(this.pageDomain)
                     .then( res => {
                         this.productList = res.rows
                         this.count = res.total
                     })
-            },
-            addOrEditProduct(){
-                let data = this.form
-
-                this.addLoading = true
-
-                if(data.id === undefined){
-                    addProduct(data).then(res => {
-                        this.$Message.success('产品' + data.name + '添加成功')
-                        this.getList(this.index, this.limit)
-                    })
-                }else{
-                    editProduct(data).then(res => {
-                        this.$Message.success('产品' + data.name + '修改成功')
-                        this.getList(this.index, this.limit)
-                    })
-                }
-
-                this.dialogFormVisible = false
-                this.addLoading = false
             },
             // 表单重置
             reset() {
@@ -177,9 +155,20 @@
             submitForm(form) {
                 this.$refs[form].validate((valid) => {
                     if (valid) {
-                        this.addOrEditProduct()
-                    } else {
-                        return false;
+                        this.addLoading = true
+                        if(this.form.id === undefined){
+                            addProduct(this.form).then(res => {
+                                this.Message.success('产品' + this.form.name + '添加成功')
+                                this.getList()
+                            })
+                        }else{
+                            editProduct(this.form).then(res => {
+                                this.Message.success('产品' + this.form.name + '修改成功')
+                                this.getList()
+                            })
+                        }
+                        this.dialogFormVisible = false
+                        this.addLoading = false
                     }
                 })
             },
@@ -196,8 +185,8 @@
                     productIds: ids
                 }
                 removeProduct(params).then(res => {
-                    this.$Message.success('删除成功')
-                    this.getList(this.index, this.limit)
+                    this.Message.success('删除成功')
+                    this.getList()
                 })
             },
             handleEdit(row) {
@@ -230,12 +219,12 @@
                     this.index = Math.ceil(this.count / val)
                 }
                 this.limit = val
-                this.getList(this.index, this.limit)
+                this.getList()
             },
             // 修改第几页
             handleCurrentChange(val) {
                 this.index = val
-                this.getList(this.index, this.limit)
+                this.getList()
             },
 
             // 多选

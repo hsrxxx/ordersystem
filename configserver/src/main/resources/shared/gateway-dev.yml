@@ -26,5 +26,3 @@ secure:
 #      - "/oauth/logout"
 #      - "/oauth/refresh"
 #      - "/**"
-#      - "/client/product/index"
-#      - "/client/product/count"

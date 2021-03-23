@@ -143,7 +143,7 @@
     import { listUser, queryUser, addUser, editUser, removeUser, getRoles } from '@/api/system/user'
 
     export default {
-        name: 'OrderSystemUser',
+        name: 'User',
         data() {
             return {
                 userList: [],
@@ -189,8 +189,8 @@
                     ]
                 },
                 pageDomain:{
-                    pageNum: undefined,
-                    pageSize: undefined,
+                    pageNum: this.index,
+                    pageSize: this.limit,
                     orderByColumn: undefined,
                     isAsc: undefined
                 },
@@ -198,7 +198,7 @@
             }
         },
         created() {
-            this.getList(1, 10)
+            this.getList()
             this.getDicts("sys_user_sex").then(response => {
                 this.sexOptions = response.data;
             });
@@ -207,34 +207,12 @@
             });
         },
         methods: {
-            getList(index, limit, orderByColumn, isAsc){
-                this.pageDomain.pageNum = index
-                this.pageDomain.pageSize = limit
+            getList(){
                 listUser(this.pageDomain)
                     .then( res => {
                         this.userList = res.rows
                         this.count = res.total
                     })
-            },
-            addOrEditUser(){
-                let data = this.form
-
-                this.addLoading = true
-
-                if(data.id === undefined){
-                    addUser(data).then(res => {
-                        this.$Message.success('用户' + data.username + '添加成功')
-                        this.getList(this.index, this.limit)
-                    })
-                }else{
-                    editUser(data).then(res => {
-                        this.$Message.success('用户' + data.username + '修改成功')
-                        this.getList(this.index, this.limit)
-                    })
-                }
-
-                this.dialogFormVisible = false
-                this.addLoading = false
             },
             // 表单重置
             reset() {
@@ -257,9 +235,20 @@
             submitForm(form) {
                 this.$refs[form].validate((valid) => {
                     if (valid) {
-                        this.addOrEditUser()
-                    } else {
-                        return false;
+                        this.addLoading = true
+                        if(this.form.id === undefined){
+                            addUser(this.form).then(res => {
+                                this.Message.success('用户' + this.form.username + '添加成功')
+                                this.getList()
+                            })
+                        }else{
+                            editUser(this.form).then(res => {
+                                this.Message.success('用户' + this.form.username + '修改成功')
+                                this.getList()
+                            })
+                        }
+                        this.dialogFormVisible = false
+                        this.addLoading = false
                     }
                 })
             },
@@ -276,8 +265,8 @@
                     userIds: ids
                 }
                 removeUser(params).then(res => {
-                    this.$Message.success("删除成功!")
-                    this.getList(this.index, this.limit)
+                    this.Message.success("删除成功!")
+                    this.getList()
                 })
             },
             handleEdit(row) {
@@ -316,12 +305,12 @@
                     this.index = Math.ceil(this.count / val)
                 }
                 this.limit = val
-                this.getList(this.index, this.limit)
+                this.getList()
             },
             // 修改第几页
             handleCurrentChange(val) {
                 this.index = val
-                this.getList(this.index, this.limit)
+                this.getList()
             },
 
             // 多选

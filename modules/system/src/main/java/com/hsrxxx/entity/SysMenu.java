@@ -47,7 +47,7 @@ public class SysMenu implements Serializable {
     /**
     * 显示顺序
     */
-    private Integer orderNum;
+    private String orderNum;
 
     /**
     * 路由地址
@@ -62,12 +62,12 @@ public class SysMenu implements Serializable {
     /**
     * 是否为外链（0是 1否）
     */
-    private Integer isFrame;
+    private String isFrame;
 
     /**
     * 是否缓存（0缓存 1不缓存）
     */
-    private Integer isCache;
+    private String isCache;
 
     /**
     * 菜单类型（M目录 C菜单 F按钮）
@@ -121,7 +121,12 @@ public class SysMenu implements Serializable {
     */
     private String remark;
 
-    /** 子菜单 */
+    /**
+     * 子菜单
+     * 非数据库字段需添加 @TableField 注解， 否则 mybatis—puls 会加入该字段进行查询
+     * 除非自定义sql语句查询
+     */
+    @TableField(exist = false)
     private List<SysMenu> children = new ArrayList<SysMenu>();
 
 }

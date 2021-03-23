@@ -23,7 +23,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         http.authorizeRequests()
                 // 返回包含所有执行器端点的匹配器。
                 .requestMatchers(EndpointRequest.toAnyEndpoint()).permitAll()
-                .antMatchers("/rsa/publicKey").permitAll()
+                .antMatchers("/rsa/publicKey","/logout","/refresh","/index").permitAll()
                 .anyRequest().authenticated();
     }
 

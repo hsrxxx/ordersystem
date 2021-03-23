@@ -23,4 +23,4 @@ export const refreshToken = () => post('/oauth/refreshToken');
  * 通过 headers 内的 token 刷新 token 时间
  * @returns {Promise<unknown>}
  */
-export const logout = () => deletefn('/oauth/logout');
+export const logout = () => get('/oauth/logout');

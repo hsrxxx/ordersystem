@@ -8,8 +8,10 @@ import com.hsrxxx.common.security.service.TokenService;
 import com.hsrxxx.service.SysLoginService;
 import com.hsrxxx.system.api.modules.LoginUser;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.oauth2.common.OAuth2AccessToken;
 import org.springframework.security.oauth2.provider.endpoint.TokenEndpoint;
+import org.springframework.security.oauth2.provider.token.ConsumerTokenServices;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.annotation.*;
 
@@ -57,7 +59,7 @@ public class AuthController {
         return R.fail(HttpStatus.FORBIDDEN, "授权类型无效");
     }
 
-    @DeleteMapping("logout")
+    @GetMapping("/logout")
     public R<?> logout(HttpServletRequest request)
     {
         LoginUser loginUser = tokenService.getLoginUser(request);
@@ -72,7 +74,7 @@ public class AuthController {
         return R.ok();
     }
 
-    @PostMapping("refresh")
+    @PostMapping("/refresh")
     public R<?> refresh(HttpServletRequest request)
     {
         LoginUser loginUser = tokenService.getLoginUser(request);

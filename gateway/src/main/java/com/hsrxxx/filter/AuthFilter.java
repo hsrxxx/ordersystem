@@ -57,10 +57,12 @@ public class AuthFilter implements GlobalFilter, Ordered {
         {
             return chain.filter(exchange);
         }
+        // 检查header头内的令牌
         String token = exchange.getRequest().getHeaders().getFirst("Authorization").replace(CacheConstants.TOKEN_PREFIX, "");
         if (StrUtil.isEmpty(token)) {
             return setUnauthorizedResponse(exchange, "令牌不能为空");
         }
+        // 检查redis内的令牌
         String userStr = sops.get(getTokenKey(token));
         if (StringUtils.isNull(userStr))
         {
