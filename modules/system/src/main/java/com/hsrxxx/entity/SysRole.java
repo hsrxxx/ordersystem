@@ -6,13 +6,11 @@ import java.time.LocalDateTime;
 import com.baomidou.mybatisplus.annotation.FieldFill;
 import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.baomidou.mybatisplus.annotation.TableField;
-import java.io.Serializable;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import lombok.AllArgsConstructor;
+import com.hsrxxx.web.entity.BaseEntity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
 /**
@@ -26,7 +24,7 @@ import lombok.experimental.Accessors;
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
-public class SysRole implements Serializable {
+public class SysRole extends BaseEntity {
 
     private static final long serialVersionUID=1L;
 
@@ -37,24 +35,10 @@ public class SysRole implements Serializable {
 
     private String roleKey;
 
-    private String createBy;
-
     /** 菜单树选择项是否关联显示（ 0：父子不互相关联显示 1：父子互相关联显示） */
     private boolean menuCheckStrictly;
 
-      @TableField(fill = FieldFill.INSERT)
-      @JsonFormat(timezone = "GMT+8",pattern="yyyy-MM-dd HH:mm:ss")
-      private LocalDateTime createTime;
-
-    private String updateBy;
-
-      @TableField(fill = FieldFill.INSERT_UPDATE)
-      @JsonFormat(timezone = "GMT+8",pattern="yyyy-MM-dd HH:mm:ss")
-      private LocalDateTime updateTime;
-
     private String status;
-
-    private String remark;
 
     @TableLogic
     private String delFlag;

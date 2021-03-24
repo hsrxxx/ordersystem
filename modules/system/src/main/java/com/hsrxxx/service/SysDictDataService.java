@@ -18,7 +18,7 @@ public interface SysDictDataService extends IService<SysDictData> {
     /**
      * 根据条件分页查询字典数据
      *
-     * @param dictType 字典类型信息
+     * @param dictData 字典类型信息
      * @return 字典类型集合信息
      */
     List<SysDictData> selectDictDataList(SysDictData dictData);

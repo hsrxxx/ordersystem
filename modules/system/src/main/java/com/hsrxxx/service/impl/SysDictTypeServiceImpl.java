@@ -1,5 +1,6 @@
 package com.hsrxxx.service.impl;
 
+import cn.hutool.core.date.DateUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.hsrxxx.common.core.constant.UserConstants;
 import com.hsrxxx.common.core.exception.CustomException;
@@ -12,7 +13,6 @@ import com.hsrxxx.service.SysDictTypeService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.hsrxxx.utils.DictUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
@@ -51,6 +51,17 @@ public class SysDictTypeServiceImpl extends ServiceImpl<SysDictTypeMapper, SysDi
             List<SysDictData> dictDatas = dictDataMapper.selectList(query);
             DictUtils.setDictCache(dictType.getDictType(), dictDatas);
         }
+    }
+
+    @Override
+    public List<SysDictType> selectDictTypeList(SysDictType dictType) {
+        QueryWrapper<SysDictType> query = new QueryWrapper<>();
+        query.like(StringUtils.isNotNull(dictType.getDictName()), "dict_name", dictType.getDictName());
+        query.like(StringUtils.isNotNull(dictType.getDictType()), "dict_type", dictType.getDictType());
+        query.like(StringUtils.isNotNull(dictType.getStatus()), "status", dictType.getStatus());
+        query.ge("create_time", dictType.getParams().get("beginTime"));
+        query.le("create_time", dictType.getParams().get("endTime"));
+        return dictTypeMapper.selectList(query);
     }
 
     /**

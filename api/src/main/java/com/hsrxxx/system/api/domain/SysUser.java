@@ -46,18 +46,6 @@ public class SysUser implements Serializable {
 
     private LocalDateTime loginTime;
 
-    private String createBy;
-
-      @TableField(fill = FieldFill.INSERT)
-      private LocalDateTime createTime;
-
-    private String updateBy;
-
-      @TableField(fill = FieldFill.INSERT_UPDATE)
-      private LocalDateTime updateTime;
-
-    private String remark;
-
     private StatusEnum status;
 
     @TableLogic

@@ -5,11 +5,11 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import java.time.LocalDateTime;
 import com.baomidou.mybatisplus.annotation.FieldFill;
 import com.baomidou.mybatisplus.annotation.TableField;
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.hsrxxx.web.entity.BaseEntity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
@@ -25,7 +25,7 @@ import lombok.experimental.Accessors;
 @Data
   @EqualsAndHashCode(callSuper = false)
   @Accessors(chain = true)
-public class SysMenu implements Serializable {
+public class SysMenu extends BaseEntity {
 
     private static final long serialVersionUID=1L;
 
@@ -94,35 +94,6 @@ public class SysMenu implements Serializable {
     * 菜单图标
     */
     private String icon;
-
-    /**
-    * 创建者
-    */
-    private String createBy;
-
-    /**
-    * 创建时间
-    */
-      @TableField(fill = FieldFill.INSERT)
-      @JsonFormat(timezone = "GMT+8",pattern="yyyy-MM-dd HH:mm:ss")
-    private LocalDateTime createTime;
-
-    /**
-    * 更新者
-    */
-    private String updateBy;
-
-    /**
-    * 更新时间
-    */
-      @TableField(fill = FieldFill.INSERT_UPDATE)
-      @JsonFormat(timezone = "GMT+8",pattern="yyyy-MM-dd HH:mm:ss")
-    private LocalDateTime updateTime;
-
-    /**
-    * 备注
-    */
-    private String remark;
 
     /**
      * 子菜单

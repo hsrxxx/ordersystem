@@ -42,8 +42,7 @@ public class SysDictTypeController extends BaseController {
     public TableDataInfo list(SysDictType dictType)
     {
         startPage();
-        System.out.println(dictType);
-        List<SysDictType> list = dictTypeService.list();
+        List<SysDictType> list = dictTypeService.selectDictTypeList(dictType);
         return getDataTable(list);
     }
 
@@ -77,7 +76,6 @@ public class SysDictTypeController extends BaseController {
         {
             return AjaxResult.error("新增字典'" + dict.getDictName() + "'失败，字典类型已存在");
         }
-        dict.setCreateBy(SecurityUtils.getUsername());
         return toAjax(dictTypeService.insertDictType(dict));
     }
 
@@ -92,7 +90,6 @@ public class SysDictTypeController extends BaseController {
         {
             return AjaxResult.error("修改字典'" + dict.getDictName() + "'失败，字典类型已存在");
         }
-        dict.setUpdateBy(SecurityUtils.getUsername());
         return toAjax(dictTypeService.updateDictType(dict));
     }
 

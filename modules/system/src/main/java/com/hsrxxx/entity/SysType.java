@@ -6,9 +6,9 @@ import java.time.LocalDateTime;
 import com.baomidou.mybatisplus.annotation.FieldFill;
 import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.baomidou.mybatisplus.annotation.TableField;
-import java.io.Serializable;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.hsrxxx.web.entity.BaseEntity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
@@ -24,7 +24,7 @@ import lombok.experimental.Accessors;
 @Data
   @EqualsAndHashCode(callSuper = false)
   @Accessors(chain = true)
-public class SysType implements Serializable {
+public class SysType extends BaseEntity {
 
     private static final long serialVersionUID=1L;
 
@@ -33,22 +33,7 @@ public class SysType implements Serializable {
 
     private String name;
 
-    private String createBy;
-
-      @TableField(fill = FieldFill.INSERT)
-      @JsonFormat(timezone = "GMT+8",pattern="yyyy-MM-dd HH:mm:ss")
-      private LocalDateTime createTime;
-
-    private String updateBy;
-
-      @TableField(fill = FieldFill.INSERT_UPDATE)
-      @JsonFormat(timezone = "GMT+8",pattern="yyyy-MM-dd HH:mm:ss")
-      private LocalDateTime updateTime;
-
-    private String remark;
-
     @TableLogic
     private String delFlag;
-
 
 }

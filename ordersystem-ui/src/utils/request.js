@@ -73,15 +73,18 @@ axios.interceptors.response.use(
         if (response.data.code === 401){
             Message.error(response.data.msg)
             removeToken()
-            router.push('login')
+            location.href = "/"
         } else if (response.data.code === 500){
             Message.error(response.data.msg)
             if (response.data.msg === '令牌不能为空'){
-                router.push('login')
+                removeToken()
+                location.href = "/"
             } else if (response.data.msg === '登录状态已过期'){
-                router.push('login')
+                removeToken()
+                location.href = "/"
             } else if (response.data.msg === '令牌验证失败'){
-                router.push('login')
+                removeToken()
+                location.href = "/"
             }
             return Promise.reject(response.data.msg);
         } else if (response.data.code !== 200){

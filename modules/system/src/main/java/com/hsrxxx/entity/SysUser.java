@@ -2,6 +2,7 @@ package com.hsrxxx.entity;
 
 import com.baomidou.mybatisplus.annotation.*;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.hsrxxx.web.entity.BaseEntity;
 import com.hsrxxx.enums.SexEnum;
 import com.hsrxxx.enums.StatusEnum;
 import lombok.AllArgsConstructor;
@@ -10,9 +11,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
-import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.util.List;
 
 /**
  * <p>
@@ -27,7 +26,7 @@ import java.util.List;
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
-public class SysUser implements Serializable {
+public class SysUser extends BaseEntity {
 
     private static final long serialVersionUID=1L;
 
@@ -52,20 +51,6 @@ public class SysUser implements Serializable {
 
     @JsonFormat(timezone = "GMT+8",pattern="yyyy-MM-dd HH:mm:ss")
     private LocalDateTime loginTime;
-
-    private String createBy;
-
-      @TableField(fill = FieldFill.INSERT)
-      @JsonFormat(timezone = "GMT+8",pattern="yyyy-MM-dd HH:mm:ss")
-      private LocalDateTime createTime;
-
-    private String updateBy;
-
-      @TableField(fill = FieldFill.INSERT_UPDATE)
-      @JsonFormat(timezone = "GMT+8",pattern="yyyy-MM-dd HH:mm:ss")
-      private LocalDateTime updateTime;
-
-    private String remark;
 
     private StatusEnum status;
 
