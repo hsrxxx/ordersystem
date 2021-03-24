@@ -1,13 +1,43 @@
 <template>
     <el-main>
+        <!--  菜单查询参数  -->
+        <el-form :model="queryParams" ref="queryForm" :inline="true" v-show="showSearch">
+            <el-form-item label="菜单名称" prop="menuName">
+                <el-input
+                        v-model="queryParams.menuName"
+                        placeholder="请输入菜单名称"
+                        clearable
+                        size="small"
+                        @keyup.enter.native="handleQuery"
+                />
+            </el-form-item>
+            <el-form-item label="状态" prop="status">
+                <el-select v-model="queryParams.status" placeholder="菜单状态" clearable size="small">
+                    <el-option
+                            v-for="dict in statusOptions"
+                            :key="dict.dictValue"
+                            :label="dict.dictLabel"
+                            :value="dict.dictValue"
+                    />
+                </el-select>
+            </el-form-item>
+            <el-form-item>
+                <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
+                <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
+            </el-form-item>
+        </el-form>
+
+        <!--  权限操作按钮  -->
         <el-row :gutter="10">
             <el-col :span="1.5">
                 <el-button type="primary" plain size="small" icon="el-icon-plus" @click="handleAdd">新增</el-button>
             </el-col>
+            <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
         </el-row>
 
+        <!-- 菜单列表 -->
         <el-table
-            id="menu"
+            v-loading="loading"
             :data="menuList"
             :header-cell-style="{ background:'#f8f8f9' }"
             style="margin-top:20px"
@@ -38,7 +68,8 @@
             </el-table-column>
         </el-table>
 
-        <el-dialog title="新增菜单" :visible.sync="dialogFormVisible" width="30%" :showClose="false" :close-on-click-modal="false">
+        <!-- 添加或修改菜单对话框 -->
+        <el-dialog :title="title" :visible.sync="dialogFormVisible" width="30%" :showClose="false" :close-on-click-modal="false">
             <el-form id="form" :model="form" :rules="rules" ref="form" label-width="80px">
                 <el-row>
                     <el-col :span="24">
@@ -133,11 +164,10 @@
                 </el-row>
             </el-form>
             <div slot="footer" class="dialog-footer">
-                <el-button @click="dialogFormVisible = false">取 消</el-button>
+                <el-button @click="cancel">取 消</el-button>
                 <el-button type="primary" @click="submitForm('form')" :loading="addLoading">{{ form.id == undefined ? '新 增':'修 改' }}</el-button>
             </div>
         </el-dialog>
-
     </el-main>
 </template>
 
@@ -152,19 +182,33 @@
         components: { Treeselect },
         data() {
             return {
+                // 遮罩层
+                loading: true,
                 // 菜单表格树数据
                 menuList: [],
+                // 显示搜索条件
+                showSearch: true,
+                // 修改按钮控制
                 editDisabled: true,
+                // 删除按钮控制
                 removeDisabled: true,
-                // 是否显示弹出层
-                dialogFormVisible: false,
+                // 添加按钮控制
                 addLoading: false,
+                // 添加/修改弹窗表单
+                dialogFormVisible: false,
                 // 菜单树选项
                 menuOptions: [],
                 // 显示状态数据字典
                 visibleOptions: [],
                 // 菜单状态数据字典
                 statusOptions: [],
+                // 查询参数
+                queryParams: {
+                    menuName: undefined,
+                    visible: undefined
+                },
+                // 表单标题
+                title: "",
                 // 表单参数
                 form: {},
                 // 表单校验
@@ -191,12 +235,15 @@
             });
         },
         methods: {
-
+            // 获取菜单列表
             getList(){
-                listMenu().then(res => {
+                this.loading = true;
+                listMenu(this.queryParams).then(res => {
                     this.menuList = this.handleTree(res.data, "id");
+                    this.loading = false;
                 });
             },
+            // 获取菜单列表
             getTreeselect() {
                 listMenu().then(response => {
                     this.menuOptions = [];
@@ -205,7 +252,7 @@
                     this.menuOptions.push(menu);
                 });
             },
-            /** 转换菜单数据结构 */
+            // 转换菜单数据结
             normalizer(node) {
                 if (node.children && !node.children.length) {
                     delete node.children;
@@ -215,6 +262,11 @@
                     label: node.name,
                     children: node.children
                 };
+            },
+            // 取消按钮
+            cancel() {
+                this.dialogFormVisible = false
+                this.reset();
             },
             // 表单重置
             reset() {
@@ -232,7 +284,7 @@
                 };
                 this.resetForm("form");
             },
-            /** 搜索按钮操作 */
+            // 搜索按钮操
             handleQuery() {
                 this.getList();
             },
@@ -243,24 +295,21 @@
                 }
                 return this.selectDictLabel(this.statusOptions, row.status);
             },
-
+            // 搜索按钮操作
+            handleQuery() {
+                this.getList();
+            },
+            // 重置按钮操作
+            resetQuery() {
+                this.resetForm("queryForm");
+                this.handleQuery();
+            },
             // 按钮交互
             submitForm(form) {
                 this.$refs[form].validate((valid) => {
                     if (valid) {
                         this.addLoading = true
-                        if(this.form.id === undefined){
-                            addMenu(this.form).then(res => {
-                                if (this.form.menuType === 'M'){
-                                    this.Message.success('目录' + this.form.name + '添加成功')
-                                } else if (this.form.menuType === 'C'){
-                                    this.Message.success('菜单' + this.form.name + '添加成功')
-                                } else if (this.form.menuType === 'F') {
-                                    this.Message.success('按钮' + this.form.name + '添加成功')
-                                }
-                                this.getList()
-                            })
-                        }else{
+                        if(this.form.id !== undefined){
                             editMenu(this.form).then(res => {
                                 if (this.form.menuType === 'M'){
                                     this.Message.success('目录' + this.form.name + '添加成功')
@@ -271,22 +320,34 @@
                                 }
                                 this.getList()
                             })
+                        }else{
+                            addMenu(this.form).then(res => {
+                                if (this.form.menuType === 'M'){
+                                    this.Message.success('目录' + this.form.name + '添加成功')
+                                } else if (this.form.menuType === 'C'){
+                                    this.Message.success('菜单' + this.form.name + '添加成功')
+                                } else if (this.form.menuType === 'F') {
+                                    this.Message.success('按钮' + this.form.name + '添加成功')
+                                }
+                                this.getList()
+                            })
                         }
-                        this.dialogFormVisible = false
                         this.addLoading = false
+                        this.dialogFormVisible = false
                     }
                 })
             },
-
+            // 删除按钮交互
             handleRemove(row){
                 removeMenu(row.id).then(res => {
                     this.Message.success("删除成功!")
                     this.getList()
                 })
             },
-
+            // 修改按钮交互
             handleEdit(row) {
                 this.reset()
+                this.title = '修改菜单'
                 this.getTreeselect()
                 queryMenu(row.id).then(res => {
                     this.form = res.data
@@ -294,9 +355,10 @@
                     this.dialogFormVisible = true
                 })
             },
-
+            // 添加按钮交互
             handleAdd(row){
                 this.reset()
+                this.title = '添加菜单'
                 this.getTreeselect()
                 if (row != null && row.id) {
                     this.form.parentId = row.id;
@@ -318,9 +380,5 @@
     input[type=number]::-webkit-outer-spin-button {
         -webkit-appearance: none;
         margin: 0;
-    }
-
-    .el-select-dropdown__item  {
-        font-size: 20px!important;
     }
 </style>

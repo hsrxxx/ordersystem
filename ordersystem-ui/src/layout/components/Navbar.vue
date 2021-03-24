@@ -13,14 +13,14 @@
 
 <script>
     import store from "../../store";
+    import { getToken, removeToken } from '@/utils/auth'
 
     export default {
         name: 'Navbar',
         methods: {
             handleCommand(command) {
-                store.dispatch('LogOut').then(() => {
-                    this.$router.push('login')
-                })
+                removeToken()
+                this.$router.push('login')
             },
         }
     }

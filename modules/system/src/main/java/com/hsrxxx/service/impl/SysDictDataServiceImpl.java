@@ -1,5 +1,7 @@
 package com.hsrxxx.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.hsrxxx.common.core.utils.StringUtils;
 import com.hsrxxx.entity.SysDictData;
 import com.hsrxxx.mapper.SysDictDataMapper;
 import com.hsrxxx.service.SysDictDataService;
@@ -23,6 +25,16 @@ public class SysDictDataServiceImpl extends ServiceImpl<SysDictDataMapper, SysDi
 
     @Autowired
     private SysDictDataMapper dictDataMapper;
+
+    @Override
+    public List<SysDictData> selectDictDataList(SysDictData dictData) {
+        QueryWrapper<SysDictData> query = new QueryWrapper<>();
+        query.like(StringUtils.isNotNull(dictData.getDictType()), "dict_type", dictData.getDictType());
+        query.like(StringUtils.isNotNull(dictData.getDictLabel()), "dict_label", dictData.getDictLabel());
+        query.like(StringUtils.isNotNull(dictData.getStatus()), "status", dictData.getStatus());
+        List<SysDictData> list = dictDataMapper.selectList(query);
+        return list;
+    }
 
     /**
      * 批量删除字典数据信息

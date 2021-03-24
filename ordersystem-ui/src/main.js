@@ -4,7 +4,7 @@ import router from './router'
 import store from './store'
 import ElementUI from 'element-ui';
 import { Message } from 'element-ui';
-import { resetForm, handleTree, selectDictLabel, parseTime } from "@/utils/common";
+import { resetForm, handleTree, selectDictLabel, parseTime, addDateRange } from "@/utils/common";
 import { queryDicts } from '@/api/system/dict/data'
 import 'element-ui/lib/theme-chalk/index.css';
 import './permission' // permission control
@@ -21,12 +21,13 @@ Vue.use(iconPicker, {FontAwesome: true, eIcon: true, eIconSymbol: true});
 
 Vue.use(ElementUI);
 
-Vue.prototype.getDicts = queryDicts
-Vue.prototype.parseTime = parseTime
-Vue.prototype.resetForm = resetForm
-Vue.prototype.handleTree = handleTree
-Vue.prototype.selectDictLabel = selectDictLabel
 Vue.prototype.Message = Message
+Vue.prototype.getDicts = queryDicts
+Vue.prototype.resetForm = resetForm
+Vue.prototype.parseTime = parseTime
+Vue.prototype.handleTree = handleTree
+Vue.prototype.addDateRange = addDateRange
+Vue.prototype.selectDictLabel = selectDictLabel
 
 Vue.config.productionTip = false
 

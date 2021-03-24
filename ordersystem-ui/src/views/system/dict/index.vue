@@ -1,6 +1,6 @@
 <template>
     <el-main>
-        <!--  产品查询参数  -->
+        <!--  字典数据查询参数  -->
         <el-form :model="queryParams" ref="queryForm" :inline="true" v-show="showSearch" label-width="68px">
             <el-form-item label="字典名称" prop="dictName">
                 <el-input
@@ -70,21 +70,27 @@
             <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
         </el-row>
 
-        <!--  产品数据  -->
-        <el-table 
+        <!--  字典类型数据  -->
+        <el-table
             v-loading="loading"
             ref="multipleTable"
-            :data="productList"
-            :header-cell-style="{background:'#f8f8f9'}"
+            :data="typeList"
+            :header-cell-style="{ background:'#f8f8f9' }"
             style="margin-top:20px"
             @selection-change="handleSelectionChange">
             <el-table-column type="selection" width="55" />
-            <el-table-column prop="id" label="编号" align="center" width="80" />
-            <el-table-column prop="name" label="菜品" align="center" />
-            <el-table-column prop="price" label="单价" align="center" />
-            <el-table-column prop="flavor" label="口味" align="center" />
-            <el-table-column prop="type" label="分类" align="center" />
-            <el-table-column prop="remark" label="备注" align="center" />
+            <el-table-column prop="dictId" label="字典编号" align="center"/>
+            <el-table-column prop="dictName" label="字典名称" align="center" />
+            <el-table-column label="字典类型" align="center" :show-overflow-tooltip="true">
+                <template slot-scope="scope">
+                    <router-link :to="'/dict/type/data/' + scope.row.dictId" class="link-type">
+                        <span>{{ scope.row.dictType }}</span>
+                    </router-link>
+                </template>
+            </el-table-column>
+            <el-table-column label="状态" align="center" prop="status" :formatter="statusFormat" />
+            <el-table-column label="备注" align="center" prop="remark" :show-overflow-tooltip="true" />
+            <el-table-column label="创建时间" align="center" prop="createTime" width="180" />
             <el-table-column
                 fixed="right"
                 label="操作"
@@ -110,34 +116,31 @@
             layout="->, total, sizes, prev, pager, next, jumper"
             :total="count" />
 
-        <!-- 添加或修改产品对话框 -->
-        <el-dialog :title="title" :visible.sync="dialogFormVisible" width="30%" :showClose="false" :close-on-click-modal="false">
-            <el-form id="form" :model="form" :rules="rules" ref="form" label-width="60px">
-                <el-form-item label="菜品" prop="name">
-                    <el-input v-model="form.name" autocomplete="off" />
+        <!-- 添加或修改字典类型对话框 -->
+        <el-dialog :title="title" :visible.sync="dialogFormVisible" width="40%" :showClose="false" :close-on-click-modal="false">
+            <el-form ref="form" :model="form" :rules="rules" label-width="80px">
+                <el-form-item label="字典名称" prop="dictName">
+                    <el-input v-model="form.dictName" placeholder="请输入字典名称" />
                 </el-form-item>
-                <el-form-item label="单价" prop="price">
-                    <el-input v-model="form.price" type="number" autocomplete="off" />
+                <el-form-item label="字典类型" prop="dictType">
+                    <el-input v-model="form.dictType" placeholder="请输入字典类型" />
                 </el-form-item>
-                <el-form-item label="口味" prop="flavor">
-                    <el-input v-model="form.flavor" autocomplete="off" />
-                </el-form-item>
-                <el-form-item label="分类" prop="tid">
-                    <el-select v-model="form.tid" placeholder="请选择分类">
-                        <el-option
-                                v-for="item in typeOptions"
-                                :key="item.id"
-                                :label="item.name"
-                                :value="item.id" />
-                    </el-select>
+                <el-form-item label="状态" prop="status">
+                    <el-radio-group v-model="form.status">
+                        <el-radio
+                                v-for="dict in statusOptions"
+                                :key="dict.dictValue"
+                                :label="dict.dictValue"
+                        >{{dict.dictLabel}}</el-radio>
+                    </el-radio-group>
                 </el-form-item>
                 <el-form-item label="备注" prop="remark">
-                    <el-input v-model="form.remark" type="textarea" placeholder="请输入内容" />
+                    <el-input v-model="form.remark" type="textarea" placeholder="请输入内容"></el-input>
                 </el-form-item>
             </el-form>
             <div slot="footer" class="dialog-footer">
                 <el-button @click="cancel">取 消</el-button>
-                <el-button type="primary" @click="submitForm('form')" :loading="addLoading">{{ form.id === undefined ? '新 增':'修 改' }}</el-button>
+                <el-button type="primary" @click="submitForm('form')" :loading="addLoading">{{ form.dictId == undefined ? '新 增':'修 改' }}</el-button>
             </div>
         </el-dialog>
     </el-main>
@@ -145,16 +148,16 @@
 
 <script>
 
-    import { listProduct, queryProduct, addProduct, editProduct, removeProduct, getTypes } from '@/api/system/product'
+    import { listType, queryType, addType, editType, removeType } from '@/api/system/dict/type'
 
     export default {
-        name: 'Product',
+        name: 'Type',
         data() {
             return {
                 // 遮罩层
                 loading: true,
-                // 产品列表
-                productList: [],
+                // 字典类型列表
+                typeList: [],
                 // 总数
                 count: 0,
                 // 第一页
@@ -175,31 +178,19 @@
                 dialogFormVisible: false,
                 // 日期范围
                 dateRange: [],
-                // 状态数据字典
-                statusOptions: [],
-                // 产品类型数据字典
-                typeOptions: [],
                 // 表单标题
                 title: '',
                 // 添加/修改表单
                 form: {},
+                // 状态数据字典
+                statusOptions: [],
                 // 表单验证
                 rules: {
-                    name: [
-                        { required: true, message: "产品名称不能为空", trigger: "blur" }
+                    dictName: [
+                        { required: true, message: "字典名称不能为空", trigger: "blur" }
                     ],
-                    price: [
-                        {
-                            pattern: /(^[1-9][0-9]{0,7}$)|(^((0\.0[1-9]$)|(^0\.[1-9]\d?)$)|(^[1-9][0-9]{0,7}\.\d{1,2})$)/,
-                            message: "请输入正确的价格",
-                            trigger: "blur"
-                        }
-                    ],
-                    flavor: [
-                        { required: true, message: "口味不能为空", trigger: "blur" }
-                    ],
-                    tid: [
-                        { required: true, message: "分类不能为空", trigger: "blur" }
+                    dictType: [
+                        { required: true, message: "字典类型不能为空", trigger: "blur" }
                     ]
                 },
                 // 分页信息
@@ -214,14 +205,17 @@
         },
         created() {
             this.getList()
+            this.getDicts("sys_normal_disable").then(response => {
+                this.statusOptions = response.data;
+            });
         },
         methods: {
-            // 获取产品列表
+            // 查询字典类型列表
             getList(){
                 this.loading = true;
-                listProduct(this.queryParams)
+                listType(this.addDateRange(this.queryParams, this.dateRange))
                     .then( res => {
-                        this.productList = res.rows
+                        this.typeList = res.rows
                         this.count = res.total
                         this.loading = false;
                     })
@@ -234,28 +228,27 @@
             // 表单重置
             reset() {
                 this.form = {
-                    id: undefined,
-                    name: undefined,
-                    price: undefined,
-                    flavor: undefined,
-                    tid: undefined,
-                    remark: undefined,
+                    dictId: undefined,
+                    dictName: undefined,
+                    dictType: undefined,
+                    status: "0",
+                    remark: undefined
                 };
                 this.resetForm("form");
             },
-            // 按钮交互
+            // 对话框添加/修改按钮交互
             submitForm(form) {
                 this.$refs[form].validate((valid) => {
                     if (valid) {
                         this.addLoading = true
-                        if(this.form.id !== undefined){
-                            editProduct(this.form).then(res => {
-                                this.Message.success('产品' + this.form.name + '修改成功')
+                        if(this.form.dictId !== undefined){
+                            editType(this.form).then(res => {
+                                this.Message.success('用户' + this.form.dictName + '修改成功')
                                 this.getList()
                             })
                         }else{
-                            addProduct(this.form).then(res => {
-                                this.Message.success('产品' + this.form.name + '添加成功')
+                            addType(this.form).then(res => {
+                                this.Message.success('用户' + this.form.dictName + '添加成功')
                                 this.getList()
                             })
                         }
@@ -264,53 +257,53 @@
                     }
                 })
             },
-            // 搜索按钮操作
-            handleQuery() {
-                this.queryParams.pageNum = 1;
-                this.getList();
-            },
-            // 重置按钮操作
-            resetQuery() {
-                this.dateRange = [];
-                this.resetForm("queryForm");
-                this.handleQuery();
-            },
             // 删除按钮交互
             handleRemove(row){
                 let ids = []
                 if (Array.isArray(row)){
                     for (let index = 0; index < row.length; index++) {
-                        ids.push(row[index].id)
+                        ids.push(row[index].dictId)
                     }
                 } else {
-                    ids.push(row.id)
+                    ids.push(row.dictId)
                 }
                 let params = {
-                    productIds: ids
+                    dictIds: ids
                 }
-                removeProduct(params).then(res => {
-                    this.Message.success('删除成功')
+                removeType(params).then(res => {
+                    this.Message.success("删除成功!")
                     this.getList()
                 })
             },
             // 修改按钮交互
             handleEdit(row) {
                 this.reset()
-                this.title = '修改产品'
-                getTypes().then(res => { this.typeOptions = res.rows })
+                this.title = '修改字典类型'
                 this.dialogFormVisible = true
-                queryProduct(row.id).then(res => {
-                    // this.form = res
+                queryType(row.dictId).then(res => {
                     this.form = res.data
-                    this.typeOptions = res.types
                 })
             },
             // 添加按钮交互
             handleAdd(){
                 this.reset()
-                this.title = '添加产品'
-                getTypes().then(res => { this.typeOptions = res.types })
+                this.title = '添加字典类型'
                 this.dialogFormVisible = true
+            },
+            // 字典状态字典翻译
+            statusFormat(row, column) {
+                return this.selectDictLabel(this.statusOptions, row.status);
+            },
+            /** 搜索按钮操作 */
+            handleQuery() {
+                this.queryParams.pageNum = 1;
+                this.getList();
+            },
+            /** 重置按钮操作 */
+            resetQuery() {
+                this.dateRange = []
+                this.resetForm("queryForm");
+                this.handleQuery();
             },
             // 修改每页数量
             handleSizeChange(val) {
@@ -347,5 +340,13 @@
     input[type=number]::-webkit-outer-spin-button {
         -webkit-appearance: none;
         margin: 0;
+    }
+
+    .link-type {
+        color: #337ab7;
+        text-decoration: none;
+    }
+    .link-type:hover {
+         color: rgb(32, 160, 255);
     }
 </style>

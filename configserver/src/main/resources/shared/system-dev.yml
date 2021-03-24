@@ -11,6 +11,9 @@ spring:
       discovery:
         # 指定nacos server地址
         server-addr: localhost:8848
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: GMT+8
 
 mybatis-plus:
 #  打印sql语句

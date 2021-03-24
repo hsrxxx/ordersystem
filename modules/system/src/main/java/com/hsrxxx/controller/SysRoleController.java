@@ -116,7 +116,7 @@ public class SysRoleController extends BaseController {
      * 删除角色
      */
     @PreAuthorize(hasPermi = "system:role:remove")
-    @DeleteMapping("/{roleIds}")
+    @DeleteMapping
     public AjaxResult remove(@RequestParam List<Long> roleIds)
     {
         return toAjax(roleService.deleteRoleByIds(roleIds));

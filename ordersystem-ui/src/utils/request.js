@@ -9,7 +9,7 @@ import { getToken, removeToken } from '@/utils/auth'
 import store from '../store'
 import router from "vue-router";
  
-let loadinginstace
+// let loadinginstace
 
 // 环境的切换
 if (process.env.NODE_ENV === 'development') {
@@ -29,28 +29,29 @@ axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded
 // 请求拦截器
 axios.interceptors.request.use(    
     config => {
-        // if (localStorage.getItem('token')) {
-        //     config.headers.Authorization = 'Bearer ' + localStorage.getItem('token');
-        // }
+        // header 添加 token
         (getToken()) && (config.headers.Authorization = 'Bearer ' + getToken())
         // 请求时加载element ui loading 组件
-        let domId = '#' + config.url.split('/')[2]
-        if (config.url.toString().indexOf('query') != -1){
-            domId = '#form'
-        }
-        if (loadinginstace){
-            loadinginstace.close()
-        }
-        loadinginstace = Loading.service({
-            // 根据 dom 的 id 来进行渲染指定 dom
-            target: domId,
-            lock: true,
-            text: 'Loading',
-            spinner: 'el-icon-loading',
-            background: 'hsla(0,0%,100%,.9)',
-            customClass:"loading",
-            fullscreen: true 
-        })
+        // let domId = '#' + config.url.split('/')[2]
+        // if (config.url.toString().indexOf('query') != -1){
+        //     domId = '#form'
+        // }
+        // if (config.url.toString().indexOf('dict') != -1){
+        //     domId = '#' + config.url.split('/')[3]
+        // }
+        // if (loadinginstace){
+        //     loadinginstace.close()
+        // }
+        // loadinginstace = Loading.service({
+        //     // 根据 dom 的 id 来进行渲染指定 dom
+        //     target: domId,
+        //     lock: true,
+        //     text: 'Loading',
+        //     spinner: 'el-icon-loading',
+        //     background: 'hsla(0,0%,100%,.9)',
+        //     customClass:"loading",
+        //     fullscreen: true
+        // })
         // // 每次发送请求之前判断是否存在token，如果存在，则统一在http请求的header都加上token，不用每次请求都手动添加了
         // // 即使本地存在token，也有可能token是过期的，所以在响应拦截器中要对返回状态进行判断
         // const token = store.state.token;
@@ -61,19 +62,18 @@ axios.interceptors.request.use(
     },    
     error => {    
         // 关闭 element ui loading 组件
-        loadinginstace && loadinginstace.close()
+        // loadinginstace && loadinginstace.close()
         return Promise.error(error);    
     })
  
 // 响应拦截器
 axios.interceptors.response.use(    
     response => {
-        loadinginstace && loadinginstace.close()
+        // loadinginstace && loadinginstace.close()
         if (response.data.code === 401){
             Message.error(response.data.msg)
-            store.dispatch('LogOut').then(() => {
-                router.push('login')
-            })
+            removeToken()
+            router.push('login')
         } else if (response.data.code === 500){
             Message.error(response.data.msg)
             if (response.data.msg === '令牌不能为空'){
@@ -94,13 +94,13 @@ axios.interceptors.response.use(
         }
     },
     error => {
-        loadinginstace && loadinginstace.close()
+        // loadinginstace && loadinginstace.close()
         return Promise.reject(error.response);
     },
     // 服务器状态码不是200的情况
     error => {
-        loadinginstace.close()
-        console.log(error)
+        // loadinginstace.close()
+        // console.log(error)
         if (error.response.status) {
             switch (error.response.data.code) {
                 // 401: 未登录

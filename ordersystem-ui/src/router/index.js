@@ -30,6 +30,19 @@ export const constantRoutes = [
       }
     ]
   },
+  {
+    path: '/dict',
+    component: Layout,
+    hidden: true,
+    children: [
+      {
+        path: 'type/data/:dictId(\\d+)',
+        component: (resolve) => require(['@/views/system/dict/data'], resolve),
+        name: 'Data',
+        meta: { title: '字典数据', icon: '' }
+      }
+    ]
+  },
 ]
 
 const router = new VueRouter({
@@ -38,22 +51,5 @@ const router = new VueRouter({
   scrollBehavior: () => ({ y: 0 }),
   routes: constantRoutes
 })
-
-// router.beforeEach((to, from, next) => {
-//   //to到哪儿 from从哪儿离开 next跳转 为空就是放行
-//   if (to.path === '/login') {
-//     //如果跳转为登录，就放行
-//     next();
-//   } else {
-//     //取出localStorage判断
-//     let token = localStorage.getItem('token');
-//     if (token == null || token === '') {
-//       Message.error('请先登录用户')
-//       next({path: 'login'});
-//     } else {
-//       next();
-//     }
-//   }
-//   });
 
 export default router

@@ -1,5 +1,62 @@
 <template>
     <el-main>
+        <!--  角色查询参数  -->
+        <el-form :model="queryParams" ref="queryForm" :inline="true" v-show="showSearch" label-width="68px">
+            <el-form-item label="字典名称" prop="dictName">
+                <el-input
+                        v-model="queryParams.dictName"
+                        placeholder="请输入字典名称"
+                        clearable
+                        size="small"
+                        style="width: 240px"
+                        @keyup.enter.native="handleQuery"
+                />
+            </el-form-item>
+            <el-form-item label="字典类型" prop="dictType">
+                <el-input
+                        v-model="queryParams.dictType"
+                        placeholder="请输入字典类型"
+                        clearable
+                        size="small"
+                        style="width: 240px"
+                        @keyup.enter.native="handleQuery"
+                />
+            </el-form-item>
+            <el-form-item label="状态" prop="status">
+                <el-select
+                        v-model="queryParams.status"
+                        placeholder="字典状态"
+                        clearable
+                        size="small"
+                        style="width: 240px"
+                >
+                    <el-option
+                            v-for="dict in statusOptions"
+                            :key="dict.dictValue"
+                            :label="dict.dictLabel"
+                            :value="dict.dictValue"
+                    />
+                </el-select>
+            </el-form-item>
+            <el-form-item label="创建时间">
+                <el-date-picker
+                        v-model="dateRange"
+                        size="small"
+                        style="width: 240px"
+                        value-format="yyyy-MM-dd"
+                        type="daterange"
+                        range-separator="-"
+                        start-placeholder="开始日期"
+                        end-placeholder="结束日期"
+                ></el-date-picker>
+            </el-form-item>
+            <el-form-item>
+                <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
+                <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
+            </el-form-item>
+        </el-form>
+
+        <!--  权限操作按钮  -->
         <el-row :gutter="10">
             <el-col :span="1.5">
                 <el-button type="primary" plain size="small" icon="el-icon-plus" @click="handleAdd">新增</el-button>
@@ -10,10 +67,60 @@
             <el-col :span="1.5">
                 <el-button type="danger" plain size="small" icon="el-icon-delete" :disabled="removeDisabled" @click="handleRemove(multipleSelection)">删除</el-button>
             </el-col>
-            <right-toolbar @queryTable="getList(1,10)"></right-toolbar>
+            <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
         </el-row>
-        
-        <el-dialog title="新增角色" :visible.sync="dialogFormVisible" width="30%" :showClose="false" :close-on-click-modal="false">
+
+        <!--  角色数据  -->
+        <el-table
+            v-loading="loading"
+            ref="multipleTable"
+            :data="roleList"
+            :header-cell-style="{ background:'#f8f8f9' }"
+            style="margin-top:20px"
+            @selection-change="handleSelectionChange">
+            <el-table-column type="selection" width="55" />
+            <el-table-column prop="id" label="角色编号" header-align="center" align="center" width="80" />
+            <el-table-column prop="roleName" label="角色名称" header-align="center" align="center" />
+            <el-table-column prop="roleKey" label="权限字符" header-align="center" align="center" />
+            <el-table-column prop="status" label="状态" header-align="center" align="center">
+                <template slot-scope="scope">
+                    <el-switch
+                            v-model="scope.row.status"
+                            active-value="0"
+                            inactive-value="1"
+                            @change="handleStatusChange(scope.row)"
+                    ></el-switch>
+                </template>
+            </el-table-column>
+            <el-table-column prop="createTime" label="创建时间" header-align="center" align="center">
+            </el-table-column>
+            <el-table-column
+                fixed="right"
+                label="操作"
+                header-align="center"
+                align="center"
+                class-name="small-padding fixed-width">
+                <template slot-scope="scope">
+                    <el-button @click="handleEdit(scope.row)" type="text" size="small"  icon="el-icon-edit">修改</el-button>
+                    <el-button @click="handleRemove(scope.row)" type="text" size="small" icon="el-icon-delete">删除</el-button>
+                </template>
+            </el-table-column>
+        </el-table>
+
+        <!--  分页器  -->
+        <el-pagination
+            style="margin-top:20px"
+            @size-change="handleSizeChange"
+            @current-change="handleCurrentChange"
+            background
+            :current-page="1"
+            :page-sizes="[10, 20, 30, 40, 50]"
+            :page-size="limit"
+            layout="->, total, sizes, prev, pager, next, jumper"
+            :total="count" />
+
+        <!-- 添加或修改角儿对话框 -->
+        <el-dialog :title="title" :visible.sync="dialogFormVisible" width="30%" :showClose="false" :close-on-click-modal="false">
             <el-form id="form" :model="form" :rules="rules" ref="form" label-width="80px">
                 <el-form-item label="角色名称" prop="roleName">
                     <el-input v-model="form.roleName" placeholder="请输入角色名称" />
@@ -50,71 +157,24 @@
                 </el-form-item>
             </el-form>
             <div slot="footer" class="dialog-footer">
-                <el-button @click="dialogFormVisible = false">取 消</el-button>
+                <el-button @click="cancel">取 消</el-button>
                 <el-button type="primary" @click="submitForm('form')" :loading="addLoading">{{ form.id == undefined ? '新 增':'修 改' }}</el-button>
             </div>
         </el-dialog>
-
-        <el-table
-            id="role"
-            ref="multipleTable"
-            :data="roleList"
-            :header-cell-style="{ background:'#f8f8f9' }"
-            style="margin-top:20px"
-            @selection-change="handleSelectionChange">
-            <el-table-column type="selection" width="55" />
-            <el-table-column prop="id" label="角色编号" header-align="center" align="center" width="80" />
-            <el-table-column prop="roleName" label="角色名称" header-align="center" align="center" />
-            <el-table-column prop="roleKey" label="权限字符" header-align="center" align="center" />
-            <el-table-column prop="status" label="状态" header-align="center" align="center">
-                <template slot-scope="scope">
-                    <el-switch
-                            v-model="scope.row.status"
-                            active-value="0"
-                            inactive-value="1"
-                            @change="handleStatusChange(scope.row)"
-                    ></el-switch>
-                </template>
-            </el-table-column>
-            <el-table-column prop="createTime" label="创建时间" header-align="center" align="center">
-                <template slot-scope="scope">
-                    <span>{{ parseTime(scope.row.createTime) }}</span>
-                </template>
-            </el-table-column>
-            <el-table-column
-                fixed="right"
-                label="操作"
-                header-align="center"
-                align="center"
-                class-name="small-padding fixed-width">
-                <template slot-scope="scope">
-                    <el-button @click="handleEdit(scope.row)" type="text" size="small"  icon="el-icon-edit">修改</el-button>
-                    <el-button @click="handleRemove(scope.row)" type="text" size="small" icon="el-icon-delete">删除</el-button>
-                </template>
-            </el-table-column>
-        </el-table>
-        <el-pagination
-            style="margin-top:20px"
-            @size-change="handleSizeChange"
-            @current-change="handleCurrentChange"
-            background
-            :current-page="1"
-            :page-sizes="[10, 20, 30, 40, 50]"
-            :page-size="limit"
-            layout="->, total, sizes, prev, pager, next, jumper"
-            :total="count" />
     </el-main>
 </template>
 
 <script>
 
     import { listRole, queryRole, addRole, editRole, removeRole, changeStatus } from '@/api/system/role'
-    import { treeselect, roleMenuTreeselect } from '@/api/system/menu'
+    import { treeselect as menuTreeselect, roleMenuTreeselect } from '@/api/system/menu'
 
     export default {
         name: 'Role',
         data() {
             return {
+                // 遮罩层
+                loading: true,
                 // 角色列表
                 roleList: [],
                 // 选中数组
@@ -125,12 +185,14 @@
                 index: 1,
                 // 每页个数
                 limit: 10,
-                // 选中列表
-                multipleSelection: [],
                 // 展开/折叠
                 menuExpand: false,
                 // 全选/全不选
                 menuNodeAll: false,
+                // 显示搜索条件
+                showSearch: true,
+                // 选中列表
+                multipleSelection: [],
                 // 修改按钮控制
                 editDisabled: true,
                 // 删除按钮控制
@@ -139,12 +201,17 @@
                 addLoading: false,
                 // 添加/修改弹窗表单
                 dialogFormVisible: false,
+                // 日期范围
+                dateRange: [],
+                // 表单标题
+                title: '',
                 // 添加/修改表单
                 form: {},
                 // 状态数据字典
                 statusOptions: [],
                 // 菜单列表
                 menuOptions: [],
+                // 默认数据
                 defaultProps: {
                     children: "children",
                     label: "label"
@@ -159,11 +226,12 @@
                     ],
                 },
                 // 查询参数
-                pageDomain:{
-                    pageNum: this.index,
-                    pageSize: this.limit,
-                    orderByColumn: undefined,
-                    isAsc: undefined
+                queryParams:{
+                    pageNum: 1,
+                    pageSize: 10,
+                    dictName: undefined,
+                    dictType: undefined,
+                    status: undefined
                 },
             }
         },
@@ -174,12 +242,20 @@
             });
         },
         methods: {
+            // 查询角色列表
             getList(){
-                listRole(this.pageDomain)
+                this.loading = true;
+                listRole(this.queryParams)
                     .then( res => {
                         this.roleList = res.rows
                         this.count = res.total
+                        this.loading = false;
                     })
+            },
+            // 取消按钮
+            cancel() {
+                this.dialogFormVisible = false
+                this.reset();
             },
             // 表单重置
             reset() {
@@ -257,6 +333,18 @@
                     }
                 })
             },
+            // 搜索按钮操作
+            handleQuery() {
+                this.queryParams.pageNum = 1;
+                this.getList();
+            },
+            // 重置按钮操作
+            resetQuery() {
+                this.dateRange = []
+                this.resetForm("queryForm");
+                this.handleQuery();
+            },
+            // 删除按钮交互
             handleRemove(row){
                 let ids = []
                 if (Array.isArray(row)){
@@ -274,8 +362,10 @@
                     this.getList()
                 })
             },
+            // 修改按钮交互
             handleEdit(row) {
                 this.reset()
+                this.title = '修改角色'
                 const roleId = row.id || this.ids
                 const roleMenu = this.getRoleMenuTreeselect(roleId);
                 queryRole(row.id).then(res => {
@@ -294,10 +384,12 @@
                     });
                 })
             },
+            // 添加按钮交互
             handleAdd(){
                 this.reset()
+                this.title = '添加产品'
                 this.dialogFormVisible = true
-                this.getMenuTreeselect();
+                this.getMenuTreeselect()
             },
             // 树权限（全选/全不选）
             handleCheckedTreeNodeAll(value, type) {
@@ -329,29 +421,28 @@
                     this.form.deptCheckStrictly = value ? true: false;
                 }
             },
-            // 分页
             // 修改每页数量
             handleSizeChange(val) {
                 if(this.count < val){
                     this.index = Math.ceil(this.count / val)
                 }
                 this.limit = val
+                this.queryParams.pageNum = this.index
+                this.queryParams.pageSize = this.limit
                 this.getList()
             },
             // 修改第几页
             handleCurrentChange(val) {
                 this.index = val
+                this.queryParams.pageNum = this.index
                 this.getList()
             },
-
             // 多选
             handleSelectionChange(val) {
                 this.multipleSelection = val;
                 this.editDisabled = this.multipleSelection.length !== 1
                 this.removeDisabled = this.multipleSelection.length === 0;
             }
-
-
         }
     }
 </script>

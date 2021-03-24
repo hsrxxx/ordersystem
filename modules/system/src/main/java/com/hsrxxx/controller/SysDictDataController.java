@@ -41,10 +41,10 @@ public class SysDictDataController extends BaseController {
 
     @PreAuthorize(hasPermi = "system:dict:list")
     @GetMapping("/list")
-    public TableDataInfo list()
+    public TableDataInfo list(SysDictData dictData)
     {
         startPage();
-        List<SysDictData> list = dictDataService.list();
+        List<SysDictData> list = dictDataService.selectDictDataList(dictData);
         return getDataTable(list);
     }
 
@@ -107,8 +107,8 @@ public class SysDictDataController extends BaseController {
      * 删除字典类型
      */
     @PreAuthorize(hasPermi = "system:dict:remove")
-    @DeleteMapping("/{dictCodes}")
-    public AjaxResult remove(@PathVariable List<Long> dictCodes)
+    @DeleteMapping
+    public AjaxResult remove(@RequestParam List<Long> dictCodes)
     {
         return toAjax(dictDataService.deleteDictDataByIds(dictCodes));
     }

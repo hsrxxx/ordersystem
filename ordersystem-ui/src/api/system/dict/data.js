@@ -26,7 +26,7 @@ export const queryDicts = (dictType) => get(`/system/dict/data/type/${dictType}`
  * @param { Object } data dictdata 对象
  * @returns {Promise<unknown>}
  */
-export const addDict = (data) => post('/system/dict/data', data);
+export const addData = (data) => post('/system/dict/data', data);
 
 /**
  * 通过 data 对象修改 dictdata, 指定 id

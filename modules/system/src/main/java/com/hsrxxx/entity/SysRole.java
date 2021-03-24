@@ -8,6 +8,7 @@ import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.baomidou.mybatisplus.annotation.TableField;
 import java.io.Serializable;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -42,11 +43,13 @@ public class SysRole implements Serializable {
     private boolean menuCheckStrictly;
 
       @TableField(fill = FieldFill.INSERT)
+      @JsonFormat(timezone = "GMT+8",pattern="yyyy-MM-dd HH:mm:ss")
       private LocalDateTime createTime;
 
     private String updateBy;
 
       @TableField(fill = FieldFill.INSERT_UPDATE)
+      @JsonFormat(timezone = "GMT+8",pattern="yyyy-MM-dd HH:mm:ss")
       private LocalDateTime updateTime;
 
     private String status;

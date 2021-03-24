@@ -59,6 +59,7 @@ export function selectDictLabel(datas, value) {
     return actions.join('');
 }
 
+// 树结构处理
 export function handleTree(data, id, parentId, children, rootId) {
     id = id || 'id'
     parentId = parentId || 'parentId'
@@ -77,4 +78,20 @@ export function handleTree(data, id, parentId, children, rootId) {
         return father[parentId] === rootId;
     });
     return treeData != '' ? treeData : data;
+}
+
+// 添加日期范围
+export function addDateRange(params, dateRange, propName) {
+    var search = params;
+    search.params = {};
+    if (null != dateRange && '' != dateRange) {
+        if (typeof(propName) === "undefined") {
+            search.params["beginTime"] = dateRange[0];
+            search.params["endTime"] = dateRange[1];
+        } else {
+            search.params["begin" + propName] = dateRange[0];
+            search.params["end" + propName] = dateRange[1];
+        }
+    }
+    return search;
 }
