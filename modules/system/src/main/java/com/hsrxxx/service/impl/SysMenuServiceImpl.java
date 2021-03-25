@@ -4,10 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.hsrxxx.common.core.constant.UserConstants;
 import com.hsrxxx.common.core.utils.SecurityUtils;
 import com.hsrxxx.common.core.utils.StringUtils;
-import com.hsrxxx.entity.SysMenu;
-import com.hsrxxx.entity.SysRole;
-import com.hsrxxx.entity.SysRoleMenu;
-import com.hsrxxx.entity.SysUser;
+import com.hsrxxx.entity.*;
 import com.hsrxxx.entity.vo.MetaVo;
 import com.hsrxxx.entity.vo.TreeSelect;
 import com.hsrxxx.mapper.SysMenuMapper;
@@ -46,20 +43,27 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu> impl
      * 根据用户查询系统菜单列表
      *
      * @param userId 用户ID
+     * @param menu 菜单查询信息
      * @return 菜单列表
      */
     @Override
-    public List<SysMenu> selectMenuList(Long userId) {
+    public List<SysMenu> selectMenuList(Long userId, SysMenu menu) {
 
         List<SysMenu> menuList;
+        QueryWrapper<SysMenu> query = new QueryWrapper<>();
+        if (StringUtils.isNotNull(menu)){
+            query.like(StringUtils.isNotNull(menu.getName()), "m.name", menu.getName());
+            query.like(StringUtils.isNotNull(menu.getStatus()), "m.status", menu.getStatus());
+        }
         // 管理员显示所有菜单信息
         if (SysUser.isAdmin(userId))
         {
-            menuList = menuMapper.selectList(null);
+            menuList = menuMapper.selectList(query);
         }
         else
         {
-            menuList = menuMapper.selectMenuListByUserId(userId);
+            query.eq("ur.user_id", userId);
+            menuList = menuMapper.selectMenuListByUserId(query);
         }
         return menuList;
     }

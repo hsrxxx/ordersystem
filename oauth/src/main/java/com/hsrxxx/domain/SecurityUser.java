@@ -1,14 +1,11 @@
 package com.hsrxxx.domain;
 
 import com.hsrxxx.entity.vo.UserRoleVO;
-import com.hsrxxx.enums.SexEnum;
-import com.hsrxxx.enums.StatusEnum;
 import lombok.Data;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -42,7 +39,7 @@ public class SecurityUser implements UserDetails {
     /**
      * 用户状态
      */
-    private StatusEnum status;
+    private String status;
 
     /**
      * 权限数据
@@ -58,7 +55,7 @@ public class SecurityUser implements UserDetails {
         this.setUsername(userRoleVO.getUsername());
         this.setPassword(userRoleVO.getPassword());
         this.setStatus(userRoleVO.getStatus());
-        this.setEnabled(userRoleVO.getStatus() == StatusEnum.normal);
+        this.setEnabled("0".equals(userRoleVO.getStatus()));
         if (userRoleVO.getRoleKey() != null) {
             this.authorities = new ArrayList<>();
             this.authorities.add(new SimpleGrantedAuthority(userRoleVO.getRoleKey()));

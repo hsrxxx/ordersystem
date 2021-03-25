@@ -19,9 +19,10 @@ public interface SysProductService extends IService<SysProduct> {
     /**
      * 获取全部产品的详情信息
      *
+     * @param product 产品查询信息
      * @return List<SysProduct>
      */
-    List<SysProduct> selectProductList();
+    List<SysProduct> selectProductList(SysProduct product);
 
     /**
      * 根据 id 获取产品的详情信息

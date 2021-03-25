@@ -84,7 +84,7 @@ export function handleTree(data, id, parentId, children, rootId) {
 export function addDateRange(params, dateRange, propName) {
     var search = params;
     search.params = {};
-    if (null != dateRange && '' != dateRange) {
+    if (Array.isArray(dateRange) && dateRange.length !== 0) {
         if (typeof(propName) === "undefined") {
             search.params["beginTime"] = dateRange[0];
             search.params["endTime"] = dateRange[1];

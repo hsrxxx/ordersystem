@@ -1,10 +1,11 @@
-import { get, post, put, deletefn } from "@/utils/request";
+import { get, qsget, post, put, deletefn } from "@/utils/request";
 
 /**
  * 获取 menu 列表
+ * @param { Object } data 菜单查询参数
  * @returns {Promise<unknown>}
  */
-export const listMenu = () => get('/system/menu/list');
+export const listMenu = (data) => qsget('/system/menu/list', data);
 
 /**
  * 获取 menu 下拉树列表

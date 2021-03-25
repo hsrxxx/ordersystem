@@ -1,6 +1,5 @@
 package com.hsrxxx.entity.vo;
 
-import com.hsrxxx.enums.StatusEnum;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -23,7 +22,7 @@ public class UserRoleVO {
 
     private String password;
 
-    private StatusEnum status;
+    private String status;
 
     private String roleKey;
 

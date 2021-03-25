@@ -2,20 +2,20 @@
     <el-main>
         <!--  用户查询参数  -->
         <el-form :model="queryParams" ref="queryForm" :inline="true" v-show="showSearch" label-width="68px">
-            <el-form-item label="字典名称" prop="dictName">
+            <el-form-item label="用户名称" prop="username">
                 <el-input
-                        v-model="queryParams.dictName"
-                        placeholder="请输入字典名称"
+                        v-model="queryParams.username"
+                        placeholder="请输入用户名称"
                         clearable
                         size="small"
                         style="width: 240px"
                         @keyup.enter.native="handleQuery"
                 />
             </el-form-item>
-            <el-form-item label="字典类型" prop="dictType">
+            <el-form-item label="手机号码" prop="telephone">
                 <el-input
-                        v-model="queryParams.dictType"
-                        placeholder="请输入字典类型"
+                        v-model="queryParams.telephone"
+                        placeholder="请输入手机号码"
                         clearable
                         size="small"
                         style="width: 240px"
@@ -25,7 +25,7 @@
             <el-form-item label="状态" prop="status">
                 <el-select
                         v-model="queryParams.status"
-                        placeholder="字典状态"
+                        placeholder="用户状态"
                         clearable
                         size="small"
                         style="width: 240px"
@@ -79,12 +79,22 @@
             style="margin-top:20px"
             @selection-change="handleSelectionChange">
             <el-table-column type="selection" width="55" />
-            <el-table-column prop="id" label="用户编号" header-align="center" align="center" width="80" />
-            <el-table-column prop="username" label="用户名称" header-align="center" align="center" />
-            <el-table-column prop="nickname" label="用户昵称" header-align="center" align="center" />
-            <el-table-column prop="telephone" label="用户手机" header-align="center" align="center" />
-            <el-table-column prop="sex" label="性别" header-align="center" align="center" />
-            <el-table-column prop="status" label="状态" header-align="center" align="center" />
+            <el-table-column prop="id" label="用户编号" align="center" width="80" />
+            <el-table-column prop="username" label="用户名称" align="center" />
+            <el-table-column prop="nickname" label="用户昵称" align="center" />
+            <el-table-column prop="telephone" label="用户手机" align="center" />
+            <el-table-column prop="sex" label="性别" :formatter="sexFormat" align="center" />
+            <el-table-column prop="status" label="状态" align="center">
+                <template slot-scope="scope">
+                    <el-switch
+                            v-model="scope.row.status"
+                            active-value="0"
+                            inactive-value="1"
+                            @change="handleStatusChange(scope.row)"
+                    ></el-switch>
+                </template>
+            </el-table-column>
+            <el-table-column prop="createTime" label="创建时间" align="center" />
             <el-table-column
                 fixed="right"
                 label="操作"
@@ -180,8 +190,7 @@
                                         v-for="item in roleOptions"
                                         :key="item.id"
                                         :label="item.roleName"
-                                        :value="item.id"
-                                        :disabled="item.status == 1" />
+                                        :value="item.id"/>
                             </el-select>
                         </el-form-item>
                     </el-col>
@@ -201,7 +210,7 @@
 
 <script>
 
-    import { listUser, queryUser, addUser, editUser, removeUser, getRoles } from '@/api/system/user'
+    import { listUser, queryUser, addUser, editUser, removeUser, getRoles, changeStatus } from '@/api/system/user'
 
     export default {
         name: 'User',
@@ -274,8 +283,8 @@
                 queryParams:{
                     pageNum: 1,
                     pageSize: 10,
-                    dictName: undefined,
-                    dictType: undefined,
+                    username: undefined,
+                    telephone: undefined,
                     status: undefined
                 },
             }
@@ -293,7 +302,7 @@
             // 查询用户列表
             getList(){
                 this.loading = true;
-                listUser(this.queryParams)
+                listUser(this.addDateRange(this.queryParams, this.dateRange))
                     .then( res => {
                         this.userList = res.rows
                         this.count = res.total
@@ -314,13 +323,36 @@
                     password: undefined,
                     email: undefined,
                     telephone: undefined,
-                    sex: '男',
+                    sex: '0',
                     address: undefined,
                     remark: undefined,
-                    status: '正常',
+                    status: '0',
                     roleIds: []
                 };
                 this.resetForm("form");
+            },
+            // 用户性别字典翻译
+            sexFormat(row, column) {
+                return this.selectDictLabel(this.sexOptions, row.sex);
+            },
+            // 角色状态修改
+            handleStatusChange(row) {
+                let text = row.status === "0" ? "启用" : "停用";
+                this.$confirm('确认要"' + text + '""' + row.username + '"用户吗?', "警告", {
+                    confirmButtonText: "确定",
+                    cancelButtonText: "取消",
+                    type: "warning"
+                }).then(function() {
+                    let data = {
+                        id: row.id,
+                        status: row.status
+                    }
+                    return changeStatus(data);
+                }).then(() => {
+                    this.Message.success(text + "成功");
+                }).catch(function() {
+                    row.status = row.status === "0" ? "1" : "0";
+                });
             },
             // 搜索按钮操作
             handleQuery() {
@@ -380,6 +412,7 @@
                 queryUser(row.id).then(res => {
                     // this.form = res
                     this.form = res.data
+                    this.form.roleIds = res.roleIds
                     this.roleOptions = res.roles
                 })
             },

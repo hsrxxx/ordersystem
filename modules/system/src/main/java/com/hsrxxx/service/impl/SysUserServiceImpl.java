@@ -30,6 +30,7 @@ import java.util.List;
  */
 @Service
 public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> implements SysUserService {
+
     @Autowired
     private SysUserMapper userMapper;
 
@@ -39,6 +40,23 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
     @Autowired
     private SysRoleMapper roleMapper;
 
+    /**
+     * 根据条件分页查询用户
+     *
+     * @param SysUser 用户查询信息
+     * @return 用户列表
+     */
+    @Override
+    public List<SysUser> selectUserList(SysUser user) {
+        QueryWrapper<SysUser> query = new QueryWrapper<>();
+        query.like(StringUtils.isNotNull(user.getUsername()), "username", user.getUsername());
+        query.like(StringUtils.isNotNull(user.getTelephone()), "telephone", user.getTelephone());
+        query.like(StringUtils.isNotNull(user.getStatus()), "status", user.getStatus());
+        if (!user.getParams().isEmpty()){
+            query.between("create_time", user.getParams().get("beginTime"), user.getParams().get("endTime"));
+        }
+        return userMapper.selectList(query);
+    }
 
     /**
      * 获取用户角色数据

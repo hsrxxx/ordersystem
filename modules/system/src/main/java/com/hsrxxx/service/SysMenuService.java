@@ -1,5 +1,6 @@
 package com.hsrxxx.service;
 
+import com.hsrxxx.entity.SysDictType;
 import com.hsrxxx.entity.SysMenu;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.hsrxxx.entity.vo.TreeSelect;
@@ -22,9 +23,10 @@ public interface SysMenuService extends IService<SysMenu> {
      * 根据用户查询系统菜单列表
      *
      * @param userId 用户ID
+     * @param menu 菜单查询信息
      * @return 菜单列表
      */
-    List<SysMenu> selectMenuList(Long userId);
+    List<SysMenu> selectMenuList(Long userId, SysMenu menu);
 
     /**
      * 根据用户ID查询权限

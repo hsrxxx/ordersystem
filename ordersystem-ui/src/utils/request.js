@@ -173,7 +173,8 @@ export function get(url, params){
  */
 export function qsget(url, params){
     return new Promise((resolve, reject) =>{
-        axios.get(url, { params: QS.stringify(params) })
+        url = url + '?' + QS.stringify(params)
+        axios.get(url)
             .then(res => {
                 resolve(res.data)
             })

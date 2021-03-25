@@ -1,7 +1,11 @@
 package com.hsrxxx.mapper;
 
+import com.baomidou.mybatisplus.core.conditions.Wrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.toolkit.Constants;
 import com.hsrxxx.entity.SysMenu;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 
 import java.util.List;
@@ -28,11 +32,11 @@ public interface SysMenuMapper extends BaseMapper<SysMenu> {
     /**
      * 根据用户查询系统菜单列表
      *
-     * @param userId 用户ID
+     * @param query 条件构造
      * @return 菜单列表
      */
-    @Select("select distinct m.* from sys_menu m left join sys_role_menu rm on m.id = rm.menu_id left join sys_user_role ur on rm.role_id = ur.role_id left join sys_role ro on ur.role_id = ro.id where ur.user_id = #{userId}")
-    List<SysMenu> selectMenuListByUserId(Long userId);
+    @Select("select distinct m.* from sys_menu m left join sys_role_menu rm on m.id = rm.menu_id left join sys_user_role ur on rm.role_id = ur.role_id left join sys_role ro on ur.role_id = ro.id ${ew.customSqlSegment}")
+    List<SysMenu> selectMenuListByUserId(@Param(Constants.WRAPPER) Wrapper wrapper);
 
     /**
      * 查询全部菜单

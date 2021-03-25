@@ -7,6 +7,8 @@ import com.hsrxxx.common.core.utils.StringUtils;
 import com.hsrxxx.common.core.web.controller.BaseController;
 import com.hsrxxx.common.core.web.domain.AjaxResult;
 import com.hsrxxx.common.core.web.page.TableDataInfo;
+import com.hsrxxx.common.log.annotation.Log;
+import com.hsrxxx.common.log.enums.BusinessType;
 import com.hsrxxx.common.security.annotation.PreAuthorize;
 import com.hsrxxx.entity.SysDictData;
 import com.hsrxxx.service.SysDictDataService;
@@ -85,6 +87,7 @@ public class SysDictDataController extends BaseController {
      * 新增字典类型
      */
     @PreAuthorize(hasPermi = "system:dict:add")
+    @Log(title = "字典数据", businessType = BusinessType.INSERT)
     @PostMapping
     public AjaxResult add(@Validated @RequestBody SysDictData dict)
     {
@@ -96,6 +99,7 @@ public class SysDictDataController extends BaseController {
      * 修改保存字典类型
      */
     @PreAuthorize(hasPermi = "system:dict:edit")
+    @Log(title = "字典数据", businessType = BusinessType.UPDATE)
     @PutMapping
     public AjaxResult edit(@Validated @RequestBody SysDictData dict)
     {
@@ -107,6 +111,7 @@ public class SysDictDataController extends BaseController {
      * 删除字典类型
      */
     @PreAuthorize(hasPermi = "system:dict:remove")
+    @Log(title = "字典类型", businessType = BusinessType.DELETE)
     @DeleteMapping
     public AjaxResult remove(@RequestParam List<Long> dictCodes)
     {

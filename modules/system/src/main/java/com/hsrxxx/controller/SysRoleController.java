@@ -6,6 +6,8 @@ import com.hsrxxx.common.core.utils.SecurityUtils;
 import com.hsrxxx.common.core.web.controller.BaseController;
 import com.hsrxxx.common.core.web.domain.AjaxResult;
 import com.hsrxxx.common.core.web.page.TableDataInfo;
+import com.hsrxxx.common.log.annotation.Log;
+import com.hsrxxx.common.log.enums.BusinessType;
 import com.hsrxxx.common.security.annotation.PreAuthorize;
 import com.hsrxxx.entity.SysRole;
 import com.hsrxxx.service.SysRoleService;
@@ -34,10 +36,10 @@ public class SysRoleController extends BaseController {
 
     @PreAuthorize(hasPermi = "system:role:list")
     @GetMapping("/list")
-    public TableDataInfo list()
+    public TableDataInfo list(SysRole role)
     {
         startPage();
-        List<SysRole> list = roleService.list();
+        List<SysRole> list = roleService.selectRoleList(role);
         return getDataTable(list);
     }
 
@@ -65,6 +67,7 @@ public class SysRoleController extends BaseController {
      * 新增角色
      */
     @PreAuthorize(hasPermi = "system:role:add")
+    @Log(title = "角色管理", businessType = BusinessType.INSERT)
     @PostMapping
     public AjaxResult add(@Validated @RequestBody SysRole role)
     {
@@ -84,6 +87,7 @@ public class SysRoleController extends BaseController {
      * 修改保存角色
      */
     @PreAuthorize(hasPermi = "system:role:edit")
+    @Log(title = "角色管理", businessType = BusinessType.UPDATE)
     @PutMapping
     public AjaxResult edit(@Validated @RequestBody SysRole role)
     {
@@ -104,6 +108,7 @@ public class SysRoleController extends BaseController {
      * 状态修改
      */
     @PreAuthorize(hasPermi = "system:role:edit")
+    @Log(title = "角色管理", businessType = BusinessType.UPDATE)
     @PutMapping("/changeStatus")
     public AjaxResult changeStatus(@RequestBody SysRole role)
     {
@@ -116,20 +121,21 @@ public class SysRoleController extends BaseController {
      * 删除角色
      */
     @PreAuthorize(hasPermi = "system:role:remove")
+    @Log(title = "角色管理", businessType = BusinessType.DELETE)
     @DeleteMapping
     public AjaxResult remove(@RequestParam List<Long> roleIds)
     {
         return toAjax(roleService.deleteRoleByIds(roleIds));
     }
 
-//    /**
-//     * 获取角色选择框列表
-//     */
-//    @PreAuthorize(hasPermi = "system:role:query")
-//    @GetMapping("/optionselect")
-//    public AjaxResult optionselect()
-//    {
-//        return AjaxResult.success(roleService.selectRoleAll());
-//    }
+    /**
+     * 获取角色选择框列表
+     */
+    @PreAuthorize(hasPermi = "system:role:query")
+    @GetMapping("/optionselect")
+    public AjaxResult optionselect()
+    {
+        return AjaxResult.success(roleService.list());
+    }
 }
 

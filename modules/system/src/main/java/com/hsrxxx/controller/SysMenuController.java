@@ -7,6 +7,8 @@ import com.hsrxxx.common.core.utils.SecurityUtils;
 import com.hsrxxx.common.core.utils.StringUtils;
 import com.hsrxxx.common.core.web.controller.BaseController;
 import com.hsrxxx.common.core.web.domain.AjaxResult;
+import com.hsrxxx.common.log.annotation.Log;
+import com.hsrxxx.common.log.enums.BusinessType;
 import com.hsrxxx.common.security.annotation.PreAuthorize;
 import com.hsrxxx.entity.SysMenu;
 import com.hsrxxx.service.SysMenuService;
@@ -36,10 +38,10 @@ public class SysMenuController extends BaseController {
      */
     @PreAuthorize(hasPermi = "system:menu:list")
     @GetMapping("/list")
-    public AjaxResult list()
+    public AjaxResult list(SysMenu menu)
     {
         Long userId = SecurityUtils.getUserId();
-        List<SysMenu> menus = menuService.selectMenuList(userId);
+        List<SysMenu> menus = menuService.selectMenuList(userId, menu);
         return AjaxResult.success(menus);
     }
 
@@ -60,7 +62,7 @@ public class SysMenuController extends BaseController {
     public AjaxResult treeselect()
     {
         Long userId = SecurityUtils.getUserId();
-        List<SysMenu> menus = menuService.selectMenuList(userId);
+        List<SysMenu> menus = menuService.selectMenuList(userId, null);
         return AjaxResult.success(menuService.buildMenuTreeSelect(menus));
     }
 
@@ -71,7 +73,7 @@ public class SysMenuController extends BaseController {
     public AjaxResult roleMenuTreeselect(@PathVariable("roleId") Long roleId)
     {
         Long userId = SecurityUtils.getUserId();
-        List<SysMenu> menus = menuService.selectMenuList(userId);
+        List<SysMenu> menus = menuService.selectMenuList(userId, null);
         AjaxResult ajax = AjaxResult.success();
         ajax.put("checkedKeys", menuService.selectMenuListByRoleId(roleId));
         ajax.put("menus", menuService.buildMenuTreeSelect(menus));
@@ -82,6 +84,7 @@ public class SysMenuController extends BaseController {
      * 新增菜单
      */
     @PreAuthorize(hasPermi = "system:menu:add")
+    @Log(title = "菜单管理", businessType = BusinessType.INSERT)
     @PostMapping
     public AjaxResult add(@Validated @RequestBody SysMenu menu)
     {
@@ -102,6 +105,7 @@ public class SysMenuController extends BaseController {
      * 修改菜单
      */
     @PreAuthorize(hasPermi = "system:menu:edit")
+    @Log(title = "菜单管理", businessType = BusinessType.UPDATE)
     @PutMapping
     public AjaxResult edit(@Validated @RequestBody SysMenu menu)
     {
@@ -126,6 +130,7 @@ public class SysMenuController extends BaseController {
      * 删除菜单
      */
     @PreAuthorize(hasPermi = "system:menu:remove")
+    @Log(title = "菜单管理", businessType = BusinessType.DELETE)
     @DeleteMapping("/{menuId}")
     public AjaxResult remove(@PathVariable("menuId") Long menuId)
     {

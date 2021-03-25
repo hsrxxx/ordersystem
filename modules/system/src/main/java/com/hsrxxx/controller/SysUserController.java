@@ -9,6 +9,8 @@ import com.hsrxxx.common.core.utils.StringUtils;
 import com.hsrxxx.common.core.web.controller.BaseController;
 import com.hsrxxx.common.core.web.domain.AjaxResult;
 import com.hsrxxx.common.core.web.page.TableDataInfo;
+import com.hsrxxx.common.log.annotation.Log;
+import com.hsrxxx.common.log.enums.BusinessType;
 import com.hsrxxx.common.security.annotation.PreAuthorize;
 import com.hsrxxx.entity.SysRole;
 import com.hsrxxx.entity.SysUser;
@@ -57,9 +59,9 @@ public class SysUserController extends BaseController {
      */
     @PreAuthorize(hasPermi = "system:user:list")
     @GetMapping("/list")
-    public TableDataInfo list() {
+    public TableDataInfo list(SysUser user) {
         startPage();
-        List<SysUser> list = userService.list();
+        List<SysUser> list = userService.selectUserList(user);
         return getDataTable(list);
     }
 
@@ -141,6 +143,7 @@ public class SysUserController extends BaseController {
      * 新增用户
      */
     @PreAuthorize(hasAnyPermi = {"system:user:add", "system:user:edit"})
+    @Log(title = "用户管理", businessType = BusinessType.INSERT)
     @PostMapping
     public AjaxResult add(@Validated @RequestBody SysUser user){
         // 判断用户名称是否重复
@@ -166,6 +169,7 @@ public class SysUserController extends BaseController {
      * 修改用户
      */
     @PreAuthorize(hasAnyPermi = {"system:user:add", "system:user:edit"})
+    @Log(title = "用户管理", businessType = BusinessType.UPDATE)
     @PutMapping
     public AjaxResult edit(@Validated @RequestBody SysUser user){
         // 检查用户是否允许操作（如是超级管理员则禁止操作）
@@ -191,6 +195,7 @@ public class SysUserController extends BaseController {
      * 删除用户
      */
     @PreAuthorize(hasPermi = "system:user:remove")
+    @Log(title = "用户管理", businessType = BusinessType.DELETE)
     @DeleteMapping
     public AjaxResult remove(@RequestParam("userIds") List<Long> userIds){
         for (Long userId : userIds)
@@ -204,6 +209,7 @@ public class SysUserController extends BaseController {
      * 重置密码
      */
     @PreAuthorize(hasPermi = "system:user:edit")
+    @Log(title = "用户管理", businessType = BusinessType.UPDATE)
     @PutMapping("/resetPwd")
     public AjaxResult resetPwd(@Validated @RequestBody SysUser user)
     {
@@ -216,6 +222,7 @@ public class SysUserController extends BaseController {
      * 状态修改
      */
     @PreAuthorize(hasPermi = "system:user:edit")
+    @Log(title = "用户管理", businessType = BusinessType.UPDATE)
     @PutMapping("/changeStatus")
     public AjaxResult changeStatus(@Validated @RequestBody SysUser user)
     {

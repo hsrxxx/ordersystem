@@ -7,6 +7,8 @@ import com.hsrxxx.common.core.utils.SecurityUtils;
 import com.hsrxxx.common.core.web.controller.BaseController;
 import com.hsrxxx.common.core.web.domain.AjaxResult;
 import com.hsrxxx.common.core.web.page.TableDataInfo;
+import com.hsrxxx.common.log.annotation.Log;
+import com.hsrxxx.common.log.enums.BusinessType;
 import com.hsrxxx.common.security.annotation.PreAuthorize;
 import com.hsrxxx.entity.SysDictData;
 import com.hsrxxx.entity.SysDictType;
@@ -69,6 +71,7 @@ public class SysDictTypeController extends BaseController {
      * 新增字典类型
      */
     @PreAuthorize(hasPermi = "system:dict:add")
+    @Log(title = "字典类型", businessType = BusinessType.INSERT)
     @PostMapping
     public AjaxResult add(@Validated @RequestBody SysDictType dict)
     {
@@ -83,6 +86,7 @@ public class SysDictTypeController extends BaseController {
      * 修改字典类型
      */
     @PreAuthorize(hasPermi = "system:dict:edit")
+    @Log(title = "字典类型", businessType = BusinessType.UPDATE)
     @PutMapping
     public AjaxResult edit(@Validated @RequestBody SysDictType dict)
     {
@@ -97,6 +101,7 @@ public class SysDictTypeController extends BaseController {
      * 删除字典类型
      */
     @PreAuthorize(hasPermi = "system:dict:remove")
+    @Log(title = "字典类型", businessType = BusinessType.DELETE)
     @DeleteMapping
     public AjaxResult remove(@RequestParam List<Long> dictIds)
     {
@@ -107,6 +112,7 @@ public class SysDictTypeController extends BaseController {
      * 清空缓存
      */
     @PreAuthorize(hasPermi = "system:dict:remove")
+    @Log(title = "字典类型", businessType = BusinessType.CLEAN)
     @DeleteMapping("/clearCache")
     public AjaxResult clearCache()
     {

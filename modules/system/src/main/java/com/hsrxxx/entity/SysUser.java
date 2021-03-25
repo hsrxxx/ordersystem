@@ -3,8 +3,6 @@ package com.hsrxxx.entity;
 import com.baomidou.mybatisplus.annotation.*;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.hsrxxx.web.entity.BaseEntity;
-import com.hsrxxx.enums.SexEnum;
-import com.hsrxxx.enums.StatusEnum;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -39,7 +37,7 @@ public class SysUser extends BaseEntity {
 
     private String nickname;
 
-    private SexEnum sex;
+    private String sex;
 
     private String email;
 
@@ -52,7 +50,10 @@ public class SysUser extends BaseEntity {
     @JsonFormat(timezone = "GMT+8",pattern="yyyy-MM-dd HH:mm:ss")
     private LocalDateTime loginTime;
 
-    private StatusEnum status;
+    /**
+     * 菜单状态（0正常 1停用）
+     */
+    private String status;
 
     @TableLogic
     private String delFlag;

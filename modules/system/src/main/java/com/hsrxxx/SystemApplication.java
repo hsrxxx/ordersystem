@@ -1,5 +1,6 @@
 package com.hsrxxx;
 
+import com.hsrxxx.common.security.annotation.EnableSRFeignClients;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -13,6 +14,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
  **/
 @SpringBootApplication
 @EnableTransactionManagement
+@EnableSRFeignClients
 @MapperScan("com.hsrxxx.mapper")
 public class SystemApplication {
     public static void main(String[] args) {

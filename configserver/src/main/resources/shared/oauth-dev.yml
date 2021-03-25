@@ -18,6 +18,8 @@ spring:
     database: 0
     port: 6379
     host: localhost
+  main:
+    allow-bean-definition-overriding: true
 
 mybatis-plus:
   #  打印sql语句
@@ -29,4 +31,4 @@ mybatis-plus:
       logic-delete-value: 2
       logic-not-delete-value: 0
   #  扫描枚举类
-  type-enums-package: com.hsrxxx.enums.**
+  type-enums-package: com.hsrxxx.common.log.enums.**

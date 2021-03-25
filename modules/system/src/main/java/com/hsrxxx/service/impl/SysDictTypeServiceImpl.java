@@ -53,14 +53,23 @@ public class SysDictTypeServiceImpl extends ServiceImpl<SysDictTypeMapper, SysDi
         }
     }
 
+    /**
+     * 根据条件分页查询字典类型
+     *
+     * @param dictType 字典类型信息
+     * @return 字典类型集合信息
+     */
     @Override
     public List<SysDictType> selectDictTypeList(SysDictType dictType) {
         QueryWrapper<SysDictType> query = new QueryWrapper<>();
         query.like(StringUtils.isNotNull(dictType.getDictName()), "dict_name", dictType.getDictName());
         query.like(StringUtils.isNotNull(dictType.getDictType()), "dict_type", dictType.getDictType());
         query.like(StringUtils.isNotNull(dictType.getStatus()), "status", dictType.getStatus());
-        query.ge("create_time", dictType.getParams().get("beginTime"));
-        query.le("create_time", dictType.getParams().get("endTime"));
+        if (!dictType.getParams().isEmpty()){
+//            query.ge("create_time", dictType.getParams().get("beginTime"));
+//            query.le("create_time", dictType.getParams().get("endTime"));
+            query.between("create_time", dictType.getParams().get("beginTime"), dictType.getParams().get("endTime"));
+        }
         return dictTypeMapper.selectList(query);
     }
 

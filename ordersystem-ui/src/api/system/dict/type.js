@@ -1,11 +1,11 @@
-import { get, post, put, qsdeletefn, deletefn } from "@/utils/request";
+import { get, qsget, post, put, qsdeletefn, deletefn } from "@/utils/request";
 
 /**
  * 获取 dicttype 列表
  * @param { Object } data 分页信息
  * @returns {Promise<unknown>}
  */
-export const listType = (data) => get('/system/dict/type/list', data);
+export const listType = (data) => qsget('/system/dict/type/list', data);
 
 /**
  * 通过 id 获取 dicttype

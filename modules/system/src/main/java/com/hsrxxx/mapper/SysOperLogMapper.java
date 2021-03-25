@@ -2,6 +2,7 @@ package com.hsrxxx.mapper;
 
 import com.hsrxxx.entity.SysOperLog;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import org.apache.ibatis.annotations.Update;
 
 /**
  * <p>
@@ -13,4 +14,11 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  */
 public interface SysOperLogMapper extends BaseMapper<SysOperLog> {
 
+    /**
+     * 清空操作日志
+     *
+     * @return 结果
+     */
+    @Update("truncate table sys_oper_log")
+    int cleanOperLog();
 }

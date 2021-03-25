@@ -26,14 +26,19 @@ public class SysDictDataServiceImpl extends ServiceImpl<SysDictDataMapper, SysDi
     @Autowired
     private SysDictDataMapper dictDataMapper;
 
+    /**
+     * 根据条件分页查询字典数据
+     *
+     * @param dictData 字典类型信息
+     * @return 字典类型集合信息
+     */
     @Override
     public List<SysDictData> selectDictDataList(SysDictData dictData) {
         QueryWrapper<SysDictData> query = new QueryWrapper<>();
         query.like(StringUtils.isNotNull(dictData.getDictType()), "dict_type", dictData.getDictType());
         query.like(StringUtils.isNotNull(dictData.getDictLabel()), "dict_label", dictData.getDictLabel());
         query.like(StringUtils.isNotNull(dictData.getStatus()), "status", dictData.getStatus());
-        List<SysDictData> list = dictDataMapper.selectList(query);
-        return list;
+        return dictDataMapper.selectList(query);
     }
 
     /**

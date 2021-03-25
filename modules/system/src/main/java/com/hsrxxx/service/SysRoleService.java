@@ -1,5 +1,6 @@
 package com.hsrxxx.service;
 
+import com.hsrxxx.entity.SysMenu;
 import com.hsrxxx.entity.SysRole;
 import com.baomidou.mybatisplus.extension.service.IService;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,6 +17,14 @@ import java.util.Set;
  * @since 2021-03-08
  */
 public interface SysRoleService extends IService<SysRole> {
+
+    /**
+     * 根据条件分页查询角色
+     *
+     * @param SysRole 角色查询信息
+     * @return 角色列表
+     */
+    List<SysRole> selectRoleList(SysRole role);
 
     /**
      * 根据用户ID查询角色

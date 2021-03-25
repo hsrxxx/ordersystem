@@ -288,9 +288,9 @@
                     }
                 });
             },
-            resetForm(formName) {
-                this.$refs[formName].resetFields();
-            },
+            // resetForm(formName) {
+            //     this.$refs[formName].resetFields();
+            // },
             register() {
                 const nikeName = this.ruleForm.user
                 const password = this.ruleForm.pass

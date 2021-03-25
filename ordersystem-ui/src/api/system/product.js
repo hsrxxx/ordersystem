@@ -1,11 +1,11 @@
-import { get, post, put, qsdeletefn } from "@/utils/request";
+import { get, qsget, post, put, qsdeletefn } from "@/utils/request";
 
 /**
  * 获取 product 列表
  * @param { Object } data 分页信息
  * @returns {Promise<unknown>}
  */
-export const listProduct = (data) => get('/system/product/list', data);
+export const listProduct = (data) => qsget('/system/product/list', data);
 
 /**
  * 通过 id 获取 product

@@ -4,7 +4,7 @@
         <el-form :model="queryParams" ref="queryForm" :inline="true" v-show="showSearch">
             <el-form-item label="菜单名称" prop="menuName">
                 <el-input
-                        v-model="queryParams.menuName"
+                        v-model="queryParams.name"
                         placeholder="请输入菜单名称"
                         clearable
                         size="small"

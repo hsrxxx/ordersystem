@@ -1,5 +1,7 @@
 package com.hsrxxx.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.hsrxxx.common.core.utils.StringUtils;
 import com.hsrxxx.entity.SysProduct;
 import com.hsrxxx.mapper.SysProductMapper;
 import com.hsrxxx.service.SysProductService;
@@ -30,8 +32,15 @@ public class SysProductServiceImpl extends ServiceImpl<SysProductMapper, SysProd
      * @return List<SysProduct>
      */
     @Override
-    public List<SysProduct> selectProductList() {
-        return productMapper.selectProductList();
+    public List<SysProduct> selectProductList(SysProduct product) {
+        QueryWrapper<SysProduct> query = new QueryWrapper<>();
+        query.like(StringUtils.isNotNull(product.getName()), "p.name", product.getName());
+        query.eq(StringUtils.isNotNull(product.getType()), "p.tid", product.getType());
+        query.eq("p.del_flag", 0);
+        if (!product.getParams().isEmpty()){
+            query.between("p.create_time", product.getParams().get("beginTime"), product.getParams().get("endTime"));
+        }
+        return productMapper.selectProductList(query);
     }
 
     /**

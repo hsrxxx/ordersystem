@@ -1,8 +1,6 @@
 package com.hsrxxx.system.api.domain;
 
 import com.baomidou.mybatisplus.annotation.*;
-import com.hsrxxx.system.api.enums.SexEnum;
-import com.hsrxxx.system.api.enums.StatusEnum;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
@@ -34,7 +32,7 @@ public class SysUser implements Serializable {
 
     private String nickname;
 
-    private SexEnum sex;
+    private String sex;
 
     private String email;
 
@@ -46,7 +44,7 @@ public class SysUser implements Serializable {
 
     private LocalDateTime loginTime;
 
-    private StatusEnum status;
+    private String status;
 
     @TableLogic
     private String delFlag;

@@ -2,39 +2,29 @@
     <el-main>
         <!--  产品查询参数  -->
         <el-form :model="queryParams" ref="queryForm" :inline="true" v-show="showSearch" label-width="68px">
-            <el-form-item label="字典名称" prop="dictName">
+            <el-form-item label="产品名称" prop="name">
                 <el-input
-                        v-model="queryParams.dictName"
-                        placeholder="请输入字典名称"
+                        v-model="queryParams.name"
+                        placeholder="请输入产品名称"
                         clearable
                         size="small"
                         style="width: 240px"
                         @keyup.enter.native="handleQuery"
                 />
             </el-form-item>
-            <el-form-item label="字典类型" prop="dictType">
-                <el-input
-                        v-model="queryParams.dictType"
-                        placeholder="请输入字典类型"
-                        clearable
-                        size="small"
-                        style="width: 240px"
-                        @keyup.enter.native="handleQuery"
-                />
-            </el-form-item>
-            <el-form-item label="状态" prop="status">
+            <el-form-item label="产品分类" prop="type">
                 <el-select
-                        v-model="queryParams.status"
-                        placeholder="字典状态"
+                        v-model="queryParams.type"
+                        placeholder="用户状态"
                         clearable
                         size="small"
                         style="width: 240px"
                 >
                     <el-option
-                            v-for="dict in statusOptions"
-                            :key="dict.dictValue"
-                            :label="dict.dictLabel"
-                            :value="dict.dictValue"
+                            v-for="type in typeOptions"
+                            :key="type.id"
+                            :label="type.name"
+                            :value="type.id"
                     />
                 </el-select>
             </el-form-item>
@@ -206,20 +196,20 @@
                 queryParams:{
                     pageNum: 1,
                     pageSize: 10,
-                    dictName: undefined,
-                    dictType: undefined,
-                    status: undefined
+                    name: undefined,
+                    type: undefined
                 },
             }
         },
         created() {
             this.getList()
+            getTypes().then(res => { this.typeOptions = res.types })
         },
         methods: {
             // 获取产品列表
             getList(){
                 this.loading = true;
-                listProduct(this.queryParams)
+                listProduct(this.addDateRange(this.queryParams, this.dateRange))
                     .then( res => {
                         this.productList = res.rows
                         this.count = res.total
@@ -297,7 +287,6 @@
             handleEdit(row) {
                 this.reset()
                 this.title = '修改产品'
-                getTypes().then(res => { this.typeOptions = res.rows })
                 this.dialogFormVisible = true
                 queryProduct(row.id).then(res => {
                     // this.form = res
@@ -309,7 +298,6 @@
             handleAdd(){
                 this.reset()
                 this.title = '添加产品'
-                getTypes().then(res => { this.typeOptions = res.types })
                 this.dialogFormVisible = true
             },
             // 修改每页数量

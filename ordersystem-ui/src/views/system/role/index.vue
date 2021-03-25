@@ -2,20 +2,20 @@
     <el-main>
         <!--  角色查询参数  -->
         <el-form :model="queryParams" ref="queryForm" :inline="true" v-show="showSearch" label-width="68px">
-            <el-form-item label="字典名称" prop="dictName">
+            <el-form-item label="角色名称" prop="dictName">
                 <el-input
-                        v-model="queryParams.dictName"
-                        placeholder="请输入字典名称"
+                        v-model="queryParams.roleName"
+                        placeholder="请输入角色名称"
                         clearable
                         size="small"
                         style="width: 240px"
                         @keyup.enter.native="handleQuery"
                 />
             </el-form-item>
-            <el-form-item label="字典类型" prop="dictType">
+            <el-form-item label="权限字符" prop="dictType">
                 <el-input
-                        v-model="queryParams.dictType"
-                        placeholder="请输入字典类型"
+                        v-model="queryParams.roleKey"
+                        placeholder="请输入权限字符"
                         clearable
                         size="small"
                         style="width: 240px"
@@ -25,7 +25,7 @@
             <el-form-item label="状态" prop="status">
                 <el-select
                         v-model="queryParams.status"
-                        placeholder="字典状态"
+                        placeholder="角色状态"
                         clearable
                         size="small"
                         style="width: 240px"
@@ -226,13 +226,13 @@
                     ],
                 },
                 // 查询参数
-                queryParams:{
+                queryParams: {
                     pageNum: 1,
                     pageSize: 10,
-                    dictName: undefined,
-                    dictType: undefined,
+                    roleName: undefined,
+                    roleKey: undefined,
                     status: undefined
-                },
+                }
             }
         },
         created() {
@@ -245,7 +245,7 @@
             // 查询角色列表
             getList(){
                 this.loading = true;
-                listRole(this.queryParams)
+                listRole(this.addDateRange(this.queryParams, this.dateRange))
                     .then( res => {
                         this.roleList = res.rows
                         this.count = res.total

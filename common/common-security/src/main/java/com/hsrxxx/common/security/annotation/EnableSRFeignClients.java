@@ -13,7 +13,7 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 @EnableFeignClients
-public @interface EnableHsFeignClients
+public @interface EnableSRFeignClients
 {
     String[] value() default {};
 

@@ -6,6 +6,8 @@ import com.hsrxxx.common.core.utils.StringUtils;
 import com.hsrxxx.common.core.web.controller.BaseController;
 import com.hsrxxx.common.core.web.domain.AjaxResult;
 import com.hsrxxx.common.core.web.page.TableDataInfo;
+import com.hsrxxx.common.log.annotation.Log;
+import com.hsrxxx.common.log.enums.BusinessType;
 import com.hsrxxx.common.security.annotation.PreAuthorize;
 import com.hsrxxx.entity.SysProduct;
 import com.hsrxxx.entity.SysType;
@@ -41,9 +43,9 @@ public class SysProductController extends BaseController {
      */
     @PreAuthorize(hasPermi = "system:product:list")
     @GetMapping("/list")
-    public TableDataInfo list() {
+    public TableDataInfo list(SysProduct product) {
         startPage();
-        List<SysProduct> list = productService.selectProductList();
+        List<SysProduct> list = productService.selectProductList(product);
         return getDataTable(list);
     }
 
@@ -66,6 +68,7 @@ public class SysProductController extends BaseController {
      * 新增产品
      */
     @PreAuthorize(hasAnyPermi = {"system:product:add", "system:product:edit"})
+    @Log(title = "产品管理", businessType = BusinessType.INSERT)
     @PostMapping
     public AjaxResult add(@Validated @RequestBody SysProduct product){
         // 判断产品名称是否重复
@@ -82,6 +85,7 @@ public class SysProductController extends BaseController {
      * 修改产品
      */
     @PreAuthorize(hasAnyPermi = {"system:product:add", "system:product:edit"})
+    @Log(title = "产品管理", businessType = BusinessType.UPDATE)
     @PutMapping
     public AjaxResult edit(@Validated @RequestBody SysProduct product){
         // 检查用户是否允许操作（如是超级管理员则禁止操作）
@@ -102,6 +106,7 @@ public class SysProductController extends BaseController {
      * 删除产品
      */
     @PreAuthorize(hasPermi = "system:product:remove")
+    @Log(title = "产品管理", businessType = BusinessType.DELETE)
     @DeleteMapping
     public AjaxResult remove(@RequestParam("productIds") List<Long> productIds){
         return toAjax(productService.removeByIds(productIds));

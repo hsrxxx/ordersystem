@@ -1,8 +1,11 @@
 package com.hsrxxx.service;
 
+import com.hsrxxx.entity.SysRole;
 import com.hsrxxx.entity.SysUser;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.hsrxxx.entity.vo.UserRoleVO;
+
+import java.util.List;
 
 /**
  * <p>
@@ -13,6 +16,14 @@ import com.hsrxxx.entity.vo.UserRoleVO;
  * @since 2021-03-08
  */
 public interface SysUserService extends IService<SysUser> {
+
+    /**
+     * 根据条件分页查询用户
+     *
+     * @param SysUser 用户查询信息
+     * @return 用户列表
+     */
+    List<SysUser> selectUserList(SysUser user);
 
     /**
      * 获取用户角色数据

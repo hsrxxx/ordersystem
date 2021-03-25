@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.hsrxxx.common.core.constant.UserConstants;
 import com.hsrxxx.common.core.exception.CustomException;
 import com.hsrxxx.common.core.utils.StringUtils;
+import com.hsrxxx.entity.SysDictType;
 import com.hsrxxx.entity.SysRole;
 import com.hsrxxx.entity.SysRoleMenu;
 import com.hsrxxx.entity.SysUserRole;
@@ -38,6 +39,23 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> impl
     @Autowired
     private SysRoleMenuMapper roleMenuMapper;
 
+    /**
+     * 根据条件分页查询角色
+     *
+     * @param SysRole 角色查询信息
+     * @return 角色列表
+     */
+    @Override
+    public List<SysRole> selectRoleList(SysRole role) {
+        QueryWrapper<SysRole> query = new QueryWrapper<>();
+        query.like(StringUtils.isNotNull(role.getRoleName()), "role_name", role.getRoleName());
+        query.like(StringUtils.isNotNull(role.getRoleKey()), "role_key", role.getRoleKey());
+        query.like(StringUtils.isNotNull(role.getStatus()), "status", role.getStatus());
+        if (!role.getParams().isEmpty()){
+            query.between("create_time", role.getParams().get("beginTime"), role.getParams().get("endTime"));
+        }
+        return roleMapper.selectList(query);
+    }
 
     /**
      * 根据用户ID查询角色
