@@ -59,13 +59,13 @@
         <!--  权限操作按钮  -->
         <el-row :gutter="10">
             <el-col :span="1.5">
-                <el-button type="primary" plain size="small" icon="el-icon-plus" @click="handleAdd">新增</el-button>
+                <el-button type="primary" plain size="mini" icon="el-icon-plus" @click="handleAdd">新增</el-button>
             </el-col>
             <el-col :span="1.5">
-                <el-button type="success" plain size="small" icon="el-icon-edit" :disabled="editDisabled" @click="handleEdit(multipleSelection[0])">修改</el-button>
+                <el-button type="success" plain size="mini" icon="el-icon-edit" :disabled="editDisabled" @click="handleEdit(multipleSelection[0])">修改</el-button>
             </el-col>
             <el-col :span="1.5">
-                <el-button type="danger" plain size="small" icon="el-icon-delete" :disabled="removeDisabled" @click="handleRemove(multipleSelection)">删除</el-button>
+                <el-button type="danger" plain size="mini" icon="el-icon-delete" :disabled="removeDisabled" @click="handleRemove(multipleSelection)">删除</el-button>
             </el-col>
             <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
         </el-row>
@@ -101,25 +101,21 @@
                 align="center"
                 class-name="small-padding fixed-width">
                 <template slot-scope="scope">
-                    <el-button @click="handleEdit(scope.row)" type="text" size="small"  icon="el-icon-edit">修改</el-button>
-                    <el-button @click="handleRemove(scope.row)" type="text" size="small" icon="el-icon-delete">删除</el-button>
+                    <el-button @click="handleEdit(scope.row)" type="text" size="mini"  icon="el-icon-edit">修改</el-button>
+                    <el-button @click="handleRemove(scope.row)" type="text" size="mini" icon="el-icon-delete">删除</el-button>
                 </template>
             </el-table-column>
         </el-table>
 
         <!--  分页器  -->
-        <el-pagination
-            style="margin-top:20px"
-            @size-change="handleSizeChange"
-            @current-change="handleCurrentChange"
-            background
-            :current-page="1"
-            :page-sizes="[10, 20, 30, 40, 50]"
-            :page-size="limit"
-            layout="->, total, sizes, prev, pager, next, jumper"
-            :total="count" />
+        <pagination
+                v-show="total > 0"
+                :total="total"
+                :page.sync="queryParams.pageNum"
+                :limit.sync="queryParams.pageSize"
+                @pagination="getList" />
 
-        <!-- 添加或修改角儿对话框 -->
+        <!-- 添加或修改角色对话框 -->
         <el-dialog :title="title" :visible.sync="dialogFormVisible" width="30%" :showClose="false" :close-on-click-modal="false">
             <el-form id="form" :model="form" :rules="rules" ref="form" label-width="80px">
                 <el-form-item label="角色名称" prop="roleName">
@@ -180,11 +176,7 @@
                 // 选中数组
                 ids: [],
                 // 总数
-                count: 0,
-                // 第一页
-                index: 1,
-                // 每页个数
-                limit: 10,
+                total: 0,
                 // 展开/折叠
                 menuExpand: false,
                 // 全选/全不选
@@ -248,7 +240,7 @@
                 listRole(this.addDateRange(this.queryParams, this.dateRange))
                     .then( res => {
                         this.roleList = res.rows
-                        this.count = res.total
+                        this.total = res.total
                         this.loading = false;
                     })
             },
@@ -289,13 +281,13 @@
                     row.status = row.status === "0" ? "1" : "0";
                 });
             },
-            /** 查询菜单树结构 */
+            // 查询菜单树结构
             getMenuTreeselect() {
                 menuTreeselect().then(response => {
                     this.menuOptions = response.data;
                 });
             },
-            /** 根据角色ID查询菜单树结构 */
+            // 根据角色ID查询菜单树结构
             getRoleMenuTreeselect(roleId) {
                 return roleMenuTreeselect(roleId).then(response => {
                     this.menuOptions = response.menus;
@@ -420,22 +412,6 @@
                 } else if (type == 'dept') {
                     this.form.deptCheckStrictly = value ? true: false;
                 }
-            },
-            // 修改每页数量
-            handleSizeChange(val) {
-                if(this.count < val){
-                    this.index = Math.ceil(this.count / val)
-                }
-                this.limit = val
-                this.queryParams.pageNum = this.index
-                this.queryParams.pageSize = this.limit
-                this.getList()
-            },
-            // 修改第几页
-            handleCurrentChange(val) {
-                this.index = val
-                this.queryParams.pageNum = this.index
-                this.getList()
             },
             // 多选
             handleSelectionChange(val) {

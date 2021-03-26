@@ -12,11 +12,13 @@ import com.hsrxxx.common.log.enums.BusinessType;
 import com.hsrxxx.common.security.annotation.PreAuthorize;
 import com.hsrxxx.entity.SysLogininfor;
 import com.hsrxxx.service.SysLogininforService;
+import eu.bitwalker.useragentutils.Browser;
+import eu.bitwalker.useragentutils.OperatingSystem;
+import eu.bitwalker.useragentutils.UserAgent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
 
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -83,6 +85,19 @@ public class SysLogininforController extends BaseController {
         logininfor.setIpaddr(ip);
         logininfor.setMsg(message);
         logininfor.setLoginTime(LocalDateTime.now());
+
+        // 获取请求头 User-Agent 信息
+        String agent = ServletUtils.getRequest().getHeader("User-Agent");
+        // 解析浏览器，系统详情信息
+        UserAgent userAgent = UserAgent.parseUserAgentString(agent);
+        //获取浏览器对象
+        Browser browser = userAgent.getBrowser();
+        //获取操作系统对象
+        OperatingSystem operatingSystem = userAgent.getOperatingSystem();
+
+        logininfor.setBrowser(browser.getName());
+        logininfor.setOs(operatingSystem.getName());
+
         // 日志状态
         if (Constants.LOGIN_SUCCESS.equals(status) || Constants.LOGOUT.equals(status))
         {

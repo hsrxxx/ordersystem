@@ -1,7 +1,6 @@
 package com.hsrxxx.component;
 
 import cn.hutool.json.JSONUtil;
-import com.hsrxxx.api.CommonResult;
 import com.hsrxxx.common.core.web.domain.AjaxResult;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.http.HttpHeaders;

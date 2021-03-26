@@ -20,7 +20,8 @@
         methods: {
             handleCommand(command) {
                 removeToken()
-                this.$router.push('login')
+                // store.dispatch("LogOut")
+                location.href = "/"
             },
         }
     }

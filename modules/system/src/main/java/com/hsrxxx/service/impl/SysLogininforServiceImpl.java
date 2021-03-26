@@ -35,7 +35,7 @@ public class SysLogininforServiceImpl extends ServiceImpl<SysLogininforMapper, S
     @Override
     public List<SysLogininfor> selectLogininforList(SysLogininfor logininfor) {
         QueryWrapper<SysLogininfor> query = new QueryWrapper<>();
-        query.like(StringUtils.isNotNull(logininfor.getIpaddr()), "ip_addr", logininfor.getIpaddr());
+        query.like(StringUtils.isNotNull(logininfor.getIpaddr()), "ipaddr", logininfor.getIpaddr());
         query.like(StringUtils.isNotNull(logininfor.getUserName()), "user_name", logininfor.getUserName());
         query.like(StringUtils.isNotNull(logininfor.getStatus()), "status", logininfor.getStatus());
         if (!logininfor.getParams().isEmpty()){

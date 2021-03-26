@@ -61,9 +61,9 @@
                 align="center"
                 class-name="small-padding fixed-width">
                 <template slot-scope="scope">
-                    <el-button @click="handleAdd(scope.row)" type="text" size="small" icon="el-icon-plus">新增</el-button>
-                    <el-button @click="handleEdit(scope.row)" type="text" size="small"  icon="el-icon-edit">修改</el-button>
-                    <el-button @click="handleRemove(scope.row)" type="text" size="small" icon="el-icon-delete">删除</el-button>
+                    <el-button @click="handleAdd(scope.row)" type="text" size="mini" icon="el-icon-plus">新增</el-button>
+                    <el-button @click="handleEdit(scope.row)" type="text" size="mini"  icon="el-icon-edit">修改</el-button>
+                    <el-button @click="handleRemove(scope.row)" type="text" size="mini" icon="el-icon-delete">删除</el-button>
                 </template>
             </el-table-column>
         </el-table>
@@ -202,11 +202,6 @@
                 visibleOptions: [],
                 // 菜单状态数据字典
                 statusOptions: [],
-                // 查询参数
-                queryParams: {
-                    menuName: undefined,
-                    visible: undefined
-                },
                 // 表单标题
                 title: "",
                 // 表单参数
@@ -222,6 +217,11 @@
                     path: [
                         { required: true, message: "路由地址不能为空", trigger: "blur" }
                     ]
+                },
+                // 查询参数
+                queryParams: {
+                    menuName: undefined,
+                    visible: undefined
                 },
             }
         },

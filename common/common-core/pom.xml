@@ -19,25 +19,21 @@
             <version>5.1.4</version>
             <scope>compile</scope>
         </dependency>
-
         <!-- Spring Web -->
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-web</artifactId>
         </dependency>
-
         <!-- Java Servlet -->
         <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>javax.servlet-api</artifactId>
         </dependency>
-
         <!-- Aspect -->
         <dependency>
             <groupId>org.aspectj</groupId>
             <artifactId>aspectjweaver</artifactId>
         </dependency>
-
         <!--    解析jwt    -->
         <dependency>
             <groupId>com.nimbusds</groupId>
@@ -45,13 +41,12 @@
             <version>8.9</version>
             <scope>compile</scope>
         </dependency>
-
         <!-- Apache Lang3 -->
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
         </dependency>
-
+        <!--  feign  -->
         <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-openfeign</artifactId>

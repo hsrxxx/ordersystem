@@ -31,12 +31,7 @@ public class AuthorizationManager implements ReactiveAuthorizationManager<Author
 
     @Override
     public Mono<AuthorizationDecision> check(Mono<Authentication> mono, AuthorizationContext authorizationContext) {
-        //从Redis中获取当前路径可访问角色列表
-//        URI uri = authorizationContext.getExchange().getRequest().getURI();
-        // uri.getPath() 当前需要鉴权的路径
-//        Object obj = redisTemplate.opsForHash().get(RedisConstant.RESOURCE_ROLES_MAP, uri.getPath());
-//        List<String> authorities = Convert.toList(String.class,obj);
-        List<String> authorities = new ArrayList<String>();
+        List<String> authorities = new ArrayList<>();
         authorities.add("admin");
         authorities.add("common");
         // 将获取到的可访问角色列表添加 "ROLE_" 字符串在前。

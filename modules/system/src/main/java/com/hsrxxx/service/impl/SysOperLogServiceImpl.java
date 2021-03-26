@@ -40,7 +40,7 @@ public class SysOperLogServiceImpl extends ServiceImpl<SysOperLogMapper, SysOper
         query.like(StringUtils.isNotNull(operLog.getBusinessType()), "business_type", operLog.getBusinessType());
         query.like(StringUtils.isNotNull(operLog.getStatus()), "status", operLog.getStatus());
         if (!operLog.getParams().isEmpty()){
-            query.between("login_time", operLog.getParams().get("beginTime"), operLog.getParams().get("endTime"));
+            query.between("oper_time", operLog.getParams().get("beginTime"), operLog.getParams().get("endTime"));
         }
         return operLogMapper.selectList(query);
     }

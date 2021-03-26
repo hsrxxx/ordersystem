@@ -1,6 +1,9 @@
 package com.hsrxxx.common.core.utils.ip;
 
 import com.hsrxxx.common.core.utils.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.client.RestTemplate;
 
 import javax.servlet.http.HttpServletRequest;
 import java.net.InetAddress;

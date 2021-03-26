@@ -48,7 +48,6 @@ function filterAsyncRouter(asyncRouterMap, lastRouter = false, type = false) {
       // Layout ParentView 组件特殊处理
       if (route.component === 'Layout') {
         route.component = Layout
-        route.path = '/' + route.path
       } else if (route.component === 'ParentView') {
         route.component = ParentView
       } else {

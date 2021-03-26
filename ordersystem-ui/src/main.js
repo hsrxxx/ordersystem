@@ -6,8 +6,9 @@ import ElementUI from 'element-ui';
 import { Message } from 'element-ui';
 import { resetForm, handleTree, selectDictLabel, parseTime, addDateRange } from "@/utils/common";
 import { queryDicts } from '@/api/system/dict/data'
+import Pagination from "@/components/Pagination";
 import 'element-ui/lib/theme-chalk/index.css';
-import './permission' // permission control
+import './permission'
 // 自定义表格工具扩展
 import RightToolbar from "@/components/RightToolbar"
 
@@ -21,6 +22,7 @@ Vue.use(iconPicker, {FontAwesome: true, eIcon: true, eIconSymbol: true});
 
 Vue.use(ElementUI);
 
+// 全局方法挂载
 Vue.prototype.Message = Message
 Vue.prototype.getDicts = queryDicts
 Vue.prototype.resetForm = resetForm
@@ -31,6 +33,8 @@ Vue.prototype.selectDictLabel = selectDictLabel
 
 Vue.config.productionTip = false
 
+// 全局组件挂载
+Vue.component('Pagination', Pagination)
 Vue.component('RightToolbar', RightToolbar)
 
 new Vue({

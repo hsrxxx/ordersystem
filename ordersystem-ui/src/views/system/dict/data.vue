@@ -40,13 +40,13 @@
         <!--  权限操作按钮  -->
         <el-row :gutter="10">
             <el-col :span="1.5">
-                <el-button type="primary" plain size="small" icon="el-icon-plus" @click="handleAdd">新增</el-button>
+                <el-button type="primary" plain size="mini" icon="el-icon-plus" @click="handleAdd">新增</el-button>
             </el-col>
             <el-col :span="1.5">
-                <el-button type="success" plain size="small" icon="el-icon-edit" :disabled="editDisabled" @click="handleEdit(multipleSelection[0])">修改</el-button>
+                <el-button type="success" plain size="mini" icon="el-icon-edit" :disabled="editDisabled" @click="handleEdit(multipleSelection[0])">修改</el-button>
             </el-col>
             <el-col :span="1.5">
-                <el-button type="danger" plain size="small" icon="el-icon-delete" :disabled="removeDisabled" @click="handleRemove(multipleSelection)">删除</el-button>
+                <el-button type="danger" plain size="mini" icon="el-icon-delete" :disabled="removeDisabled" @click="handleRemove(multipleSelection)">删除</el-button>
             </el-col>
             <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
         </el-row>
@@ -74,23 +74,19 @@
                     align="center"
                     class-name="small-padding fixed-width">
                 <template slot-scope="scope">
-                    <el-button @click="handleEdit(scope.row)" type="text" size="small"  icon="el-icon-edit">修改</el-button>
-                    <el-button @click="handleRemove(scope.row)" type="text" size="small" icon="el-icon-delete">删除</el-button>
+                    <el-button @click="handleEdit(scope.row)" type="text" size="mini"  icon="el-icon-edit">修改</el-button>
+                    <el-button @click="handleRemove(scope.row)" type="text" size="mini" icon="el-icon-delete">删除</el-button>
                 </template>
             </el-table-column>
         </el-table>
 
         <!--  分页器  -->
-        <el-pagination
-                style="margin-top:20px"
-                @size-change="handleSizeChange"
-                @current-change="handleCurrentChange"
-                background
-                :current-page="1"
-                :page-sizes="[10, 20, 30, 40, 50]"
-                :page-size="limit"
-                layout="->, total, sizes, prev, pager, next, jumper"
-                :total="count" />
+        <pagination
+                v-show="total > 0"
+                :total="total"
+                :page.sync="queryParams.pageNum"
+                :limit.sync="queryParams.pageSize"
+                @pagination="getList" />
 
         <!-- 添加或修改字典数据对话框 -->
         <el-dialog :title="title" :visible.sync="dialogFormVisible" width="40%" :showClose="false" :close-on-click-modal="false">
@@ -142,11 +138,7 @@
                 // 字典类型列表
                 dataList: [],
                 // 总数
-                count: 0,
-                // 第一页
-                index: 1,
-                // 每页个数
-                limit: 10,
+                total: 0,
                 // 显示搜索条件
                 showSearch: true,
                 // 选中列表
@@ -220,7 +212,7 @@
                 listData(this.queryParams)
                     .then( res => {
                         this.dataList = res.rows
-                        this.count = res.total
+                        this.total = res.total
                         this.loading = false;
                     })
             },
@@ -306,22 +298,6 @@
             // 字典状态字典翻译
             statusFormat(row, column) {
                 return this.selectDictLabel(this.statusOptions, row.status);
-            },
-            // 修改每页数量
-            handleSizeChange(val) {
-                if(this.count < val){
-                    this.index = Math.ceil(this.count / val)
-                }
-                this.limit = val
-                this.queryParams.pageNum = this.index
-                this.queryParams.pageSize = this.limit
-                this.getList()
-            },
-            // 修改第几页
-            handleCurrentChange(val) {
-                this.index = val
-                this.queryParams.pageNum = this.index
-                this.getList()
             },
             // 多选
             handleSelectionChange(val) {
