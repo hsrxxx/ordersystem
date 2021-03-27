@@ -48,6 +48,9 @@
             <el-col :span="1.5">
                 <el-button type="danger" plain size="mini" icon="el-icon-delete" :disabled="removeDisabled" @click="handleRemove(multipleSelection)">删除</el-button>
             </el-col>
+            <el-col :span="1.5">
+                <el-button type="warning" plain size="mini" icon="el-icon-download" @click="handleExport">导出</el-button>
+            </el-col>
             <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
         </el-row>
 
@@ -284,16 +287,22 @@
                 this.dialogFormVisible = true
                 this.form.dictType = this.defaultDictType
             },
-            // 搜索按钮操作
+            // 搜索按钮交互
             handleQuery() {
                 this.queryParams.pageNum = 1;
                 this.getList();
             },
-            // 重置按钮操作
+            // 重置按钮交互
             resetQuery() {
                 this.resetForm("queryForm");
                 this.queryParams.dictType = this.defaultDictType;
                 this.handleQuery();
+            },
+            // 导出按钮交互
+            handleExport(){
+                this.download('system/dict/data/export', {
+                    ...this.queryParams
+                }, `data_${new Date().getTime()}.xlsx`)
             },
             // 字典状态字典翻译
             statusFormat(row, column) {

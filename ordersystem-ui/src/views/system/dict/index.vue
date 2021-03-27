@@ -67,6 +67,9 @@
             <el-col :span="1.5">
                 <el-button type="danger" plain size="mini" icon="el-icon-delete" :disabled="removeDisabled" @click="handleRemove(multipleSelection)">删除</el-button>
             </el-col>
+            <el-col :span="1.5">
+                <el-button type="warning" plain size="mini" icon="el-icon-download" @click="handleExport">导出</el-button>
+            </el-col>
             <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
         </el-row>
 
@@ -281,6 +284,12 @@
                 this.reset()
                 this.title = '添加字典类型'
                 this.dialogFormVisible = true
+            },
+            // 导出按钮交互
+            handleExport(){
+                this.download('system/dict/type/export', {
+                    ...this.queryParams
+                }, `type_${new Date().getTime()}.xlsx`)
             },
             // 字典状态字典翻译
             statusFormat(row, column) {

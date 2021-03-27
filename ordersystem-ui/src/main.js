@@ -4,6 +4,7 @@ import router from './router'
 import store from './store'
 import ElementUI from 'element-ui';
 import { Message } from 'element-ui';
+import { download } from '@/utils/request'
 import { resetForm, handleTree, selectDictLabel, parseTime, addDateRange } from "@/utils/common";
 import { queryDicts } from '@/api/system/dict/data'
 import Pagination from "@/components/Pagination";
@@ -24,6 +25,7 @@ Vue.use(ElementUI);
 
 // 全局方法挂载
 Vue.prototype.Message = Message
+Vue.prototype.download = download
 Vue.prototype.getDicts = queryDicts
 Vue.prototype.resetForm = resetForm
 Vue.prototype.parseTime = parseTime

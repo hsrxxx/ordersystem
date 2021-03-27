@@ -3,6 +3,7 @@ package com.hsrxxx.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.hsrxxx.common.core.constant.UserConstants;
 import com.hsrxxx.common.core.exception.CustomException;
+import com.hsrxxx.common.core.utils.SecurityUtils;
 import com.hsrxxx.common.core.utils.StringUtils;
 import com.hsrxxx.entity.SysRole;
 import com.hsrxxx.entity.SysUser;
@@ -11,6 +12,7 @@ import com.hsrxxx.entity.vo.UserRoleVO;
 import com.hsrxxx.mapper.SysRoleMapper;
 import com.hsrxxx.mapper.SysUserMapper;
 import com.hsrxxx.mapper.SysUserRoleMapper;
+import com.hsrxxx.service.SysConfigService;
 import com.hsrxxx.service.SysUserService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.beans.BeanUtils;
@@ -39,6 +41,9 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
 
     @Autowired
     private SysRoleMapper roleMapper;
+
+    @Autowired
+    private SysConfigService configService;
 
     /**
      * 根据条件分页查询用户
@@ -197,6 +202,14 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
         return userMapper.updateById(user);
     }
 
+    @Override
+    public Long getUserIdByUserName(String userName) {
+        QueryWrapper<SysUser> query = new QueryWrapper<>();
+        query.eq("username",userName);
+        SysUser user = userMapper.selectOne(query);
+        return user.getId();
+    }
+
     /**
      * 新增用户信息
      * @param user
@@ -237,5 +250,74 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
                 }
             }
         }
+    }
+
+    /**
+     * 导入用户数据
+     *
+     * @param userList 用户数据列表
+     * @param isUpdateSupport 是否更新支持，如果已存在，则进行更新数据
+     * @param operName 操作用户
+     * @return 结果
+     */
+    @Override
+    public String importUser(List<SysUser> userList, Boolean isUpdateSupport, String operName)
+    {
+        if (StringUtils.isNull(userList) || userList.size() == 0)
+        {
+            throw new CustomException("导入用户数据不能为空！");
+        }
+        int successNum = 0;
+        int failureNum = 0;
+        StringBuilder successMsg = new StringBuilder();
+        StringBuilder failureMsg = new StringBuilder();
+        String password = configService.selectConfigByKey("sys.user.initPassword");
+        for (SysUser user : userList)
+        {
+            try
+            {
+                // 验证是否存在这个用户
+                QueryWrapper<SysUser> query = new QueryWrapper<>();
+                query.eq("username", user.getUsername());
+                SysUser u = userMapper.selectOne(query);
+                if (StringUtils.isNull(u))
+                {
+                    user.setPassword(SecurityUtils.encryptPassword(StringUtils.isNull(user.getPassword()) ? password : user.getPassword()));
+                    user.setCreateBy(operName);
+                    this.insertUser(user);
+                    successNum++;
+                    successMsg.append("<br/>" + successNum + "、账号 " + user.getUsername() + " 导入成功");
+                }
+                else if (isUpdateSupport)
+                {
+                    user.setUpdateBy(operName);
+                    this.updateUser(user);
+                    successNum++;
+                    successMsg.append("<br/>" + successNum + "、账号 " + user.getUsername() + " 更新成功");
+                }
+                else
+                {
+                    failureNum++;
+                    failureMsg.append("<br/>" + failureNum + "、账号 " + user.getUsername() + " 已存在");
+                }
+            }
+            catch (Exception e)
+            {
+                failureNum++;
+                String msg = "<br/>" + failureNum + "、账号 " + user.getUsername() + " 导入失败：";
+                failureMsg.append(msg + e.getMessage());
+                log.error(msg, e);
+            }
+        }
+        if (failureNum > 0)
+        {
+            failureMsg.insert(0, "很抱歉，导入失败！共 " + failureNum + " 条数据格式不正确，错误如下：");
+            throw new CustomException(failureMsg.toString());
+        }
+        else
+        {
+            successMsg.insert(0, "恭喜您，数据已全部导入成功！共 " + successNum + " 条，数据如下：");
+        }
+        return successMsg.toString();
     }
 }

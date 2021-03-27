@@ -64,6 +64,12 @@ public interface SysUserService extends IService<SysUser> {
      */
     void checkUserAllowed(SysUser user);
 
+    /**
+     * 通过用户名获取用户ID
+     * @param userName
+     * @return
+     */
+    Long getUserIdByUserName(String userName);
 
     /**
      * 重置用户密码
@@ -101,4 +107,14 @@ public interface SysUserService extends IService<SysUser> {
      * @return
      */
     int updateUser(SysUser user);
+
+    /**
+     * 导入用户数据
+     *
+     * @param userList 用户数据列表
+     * @param isUpdateSupport 是否更新支持，如果已存在，则进行更新数据
+     * @param operName 操作用户
+     * @return 结果
+     */
+    String importUser(List<SysUser> userList, Boolean isUpdateSupport, String operName);
 }

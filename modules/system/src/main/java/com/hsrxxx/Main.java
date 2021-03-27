@@ -40,14 +40,14 @@ public class Main {
         //不覆盖之前生成的文件
 //        globalConfig.setFileOverride(false);
         // 输出地址
-        globalConfig.setOutputDir(System.getProperty("modules.dir") + "/system/src/main/java");
+        globalConfig.setOutputDir(System.getProperty("modules.dir") + "/src/main/java");
         globalConfig.setAuthor("松仁");
         globalConfig.setServiceName("%sService");
         autoGenerator.setGlobalConfig(globalConfig);
 
         // new 包配置对象
         PackageConfig packageConfig = new PackageConfig();
-        packageConfig.setParent("com.hsrxxx.test");
+        packageConfig.setParent("com.hsrxxx");
         packageConfig.setEntity("entity");
         packageConfig.setMapper("mapper");
         packageConfig.setController("controller");
@@ -58,6 +58,7 @@ public class Main {
         // new 生成策略对象
         StrategyConfig strategyConfig = new StrategyConfig();
         //可以用同配符号:表示生成t_开头的对应库下所有表
+        strategyConfig.setInclude("sys_config");
 //        strategyConfig.setInclude("t"+"_\\w*");
 //        strategyConfig.setInclude("t_order");
         //实体是否为lombok模型（默认 false）

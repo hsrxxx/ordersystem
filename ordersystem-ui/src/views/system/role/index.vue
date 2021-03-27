@@ -67,6 +67,9 @@
             <el-col :span="1.5">
                 <el-button type="danger" plain size="mini" icon="el-icon-delete" :disabled="removeDisabled" @click="handleRemove(multipleSelection)">删除</el-button>
             </el-col>
+            <el-col :span="1.5">
+                <el-button type="warning" plain size="mini" icon="el-icon-download" @click="handleExport">导出</el-button>
+            </el-col>
             <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
         </el-row>
 
@@ -382,6 +385,12 @@
                 this.title = '添加产品'
                 this.dialogFormVisible = true
                 this.getMenuTreeselect()
+            },
+            // 导出按钮交互
+            handleExport(){
+                this.download('system/role/export', {
+                    ...this.queryParams
+                }, `role_${new Date().getTime()}.xlsx`)
             },
             // 树权限（全选/全不选）
             handleCheckedTreeNodeAll(value, type) {

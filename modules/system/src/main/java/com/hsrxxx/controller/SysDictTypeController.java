@@ -4,6 +4,7 @@ package com.hsrxxx.controller;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.hsrxxx.common.core.constant.UserConstants;
 import com.hsrxxx.common.core.utils.SecurityUtils;
+import com.hsrxxx.common.core.utils.poi.ExcelUtil;
 import com.hsrxxx.common.core.web.controller.BaseController;
 import com.hsrxxx.common.core.web.domain.AjaxResult;
 import com.hsrxxx.common.core.web.page.TableDataInfo;
@@ -48,14 +49,20 @@ public class SysDictTypeController extends BaseController {
         return getDataTable(list);
     }
 
-//    @PreAuthorize(hasPermi = "system:dict:export")
-//    @PostMapping("/export")
-//    public void export(HttpServletResponse response, SysDictType dictType) throws IOException
-//    {
-//        List<SysDictType> list = dictTypeService.selectDictTypeList(dictType);
-//        ExcelUtil<SysDictType> util = new ExcelUtil<SysDictType>(SysDictType.class);
-//        util.exportExcel(response, list, "字典类型");
-//    }
+    /**
+     * 导出字典类型数据表格
+     * @param response
+     * @param dictType
+     * @throws IOException
+     */
+    @PreAuthorize(hasPermi = "system:dict:export")
+    @PostMapping("/export")
+    public void export(HttpServletResponse response, SysDictType dictType) throws IOException
+    {
+        List<SysDictType> list = dictTypeService.selectDictTypeList(dictType);
+        ExcelUtil<SysDictType> util = new ExcelUtil<SysDictType>(SysDictType.class);
+        util.exportExcel(response, list, "字典类型");
+    }
 
     /**
      * 查询字典类型详细

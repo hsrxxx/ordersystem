@@ -3,6 +3,7 @@ package com.hsrxxx.controller;
 
 import com.hsrxxx.common.core.constant.UserConstants;
 import com.hsrxxx.common.core.utils.SecurityUtils;
+import com.hsrxxx.common.core.utils.poi.ExcelUtil;
 import com.hsrxxx.common.core.web.controller.BaseController;
 import com.hsrxxx.common.core.web.domain.AjaxResult;
 import com.hsrxxx.common.core.web.page.TableDataInfo;
@@ -43,14 +44,14 @@ public class SysRoleController extends BaseController {
         return getDataTable(list);
     }
 
-//    @PreAuthorize(hasPermi = "system:role:export")
-//    @PostMapping("/export")
-//    public void export(HttpServletResponse response, SysRole role) throws IOException
-//    {
-//        List<SysRole> list = roleService.selectRoleList(role);
-//        ExcelUtil<SysRole> util = new ExcelUtil<SysRole>(SysRole.class);
-//        util.exportExcel(response, list, "角色数据");
-//    }
+    @PreAuthorize(hasPermi = "system:role:export")
+    @PostMapping("/export")
+    public void export(HttpServletResponse response, SysRole role) throws IOException
+    {
+        List<SysRole> list = roleService.selectRoleList(role);
+        ExcelUtil<SysRole> util = new ExcelUtil<SysRole>(SysRole.class);
+        util.exportExcel(response, list, "角色数据");
+    }
 
 
     /**

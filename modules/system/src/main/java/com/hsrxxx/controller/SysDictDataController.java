@@ -4,6 +4,7 @@ package com.hsrxxx.controller;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.hsrxxx.common.core.utils.SecurityUtils;
 import com.hsrxxx.common.core.utils.StringUtils;
+import com.hsrxxx.common.core.utils.poi.ExcelUtil;
 import com.hsrxxx.common.core.web.controller.BaseController;
 import com.hsrxxx.common.core.web.domain.AjaxResult;
 import com.hsrxxx.common.core.web.page.TableDataInfo;
@@ -50,14 +51,20 @@ public class SysDictDataController extends BaseController {
         return getDataTable(list);
     }
 
-//    @PreAuthorize(hasPermi = "system:dict:export")
-//    @PostMapping("/export")
-//    public void export(HttpServletResponse response, SysDictData dictData) throws IOException
-//    {
-//        List<SysDictData> list = dictDataService.selectDictDataList(dictData);
-//        ExcelUtil<SysDictData> util = new ExcelUtil<SysDictData>(SysDictData.class);
-//        util.exportExcel(response, list, "字典数据");
-//    }
+    /**
+     * 导出字典数据表格
+     * @param response
+     * @param dictData
+     * @throws IOException
+     */
+    @PreAuthorize(hasPermi = "system:dict:export")
+    @PostMapping("/export")
+    public void export(HttpServletResponse response, SysDictData dictData) throws IOException
+    {
+        List<SysDictData> list = dictDataService.selectDictDataList(dictData);
+        ExcelUtil<SysDictData> util = new ExcelUtil<SysDictData>(SysDictData.class);
+        util.exportExcel(response, list, "字典数据");
+    }
 
     /**
      * 查询字典数据详细

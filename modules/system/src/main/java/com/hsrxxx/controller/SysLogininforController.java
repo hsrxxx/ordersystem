@@ -2,8 +2,10 @@ package com.hsrxxx.controller;
 
 
 import com.hsrxxx.common.core.constant.Constants;
+import com.hsrxxx.common.core.utils.SecurityUtils;
 import com.hsrxxx.common.core.utils.ServletUtils;
 import com.hsrxxx.common.core.utils.ip.IpUtils;
+import com.hsrxxx.common.core.utils.poi.ExcelUtil;
 import com.hsrxxx.common.core.web.controller.BaseController;
 import com.hsrxxx.common.core.web.domain.AjaxResult;
 import com.hsrxxx.common.core.web.page.TableDataInfo;
@@ -11,7 +13,9 @@ import com.hsrxxx.common.log.annotation.Log;
 import com.hsrxxx.common.log.enums.BusinessType;
 import com.hsrxxx.common.security.annotation.PreAuthorize;
 import com.hsrxxx.entity.SysLogininfor;
+import com.hsrxxx.entity.SysUser;
 import com.hsrxxx.service.SysLogininforService;
+import com.hsrxxx.service.SysUserService;
 import eu.bitwalker.useragentutils.Browser;
 import eu.bitwalker.useragentutils.OperatingSystem;
 import eu.bitwalker.useragentutils.UserAgent;
@@ -19,6 +23,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -37,6 +43,9 @@ public class SysLogininforController extends BaseController {
     @Autowired
     private SysLogininforService logininforService;
 
+    @Autowired
+    private SysUserService userService;
+
     @PreAuthorize(hasPermi = "system:logininfor:list")
     @GetMapping("/list")
     public TableDataInfo list(SysLogininfor logininfor)
@@ -46,15 +55,21 @@ public class SysLogininforController extends BaseController {
         return getDataTable(list);
     }
 
-//    @Log(title = "登录日志", businessType = BusinessType.EXPORT)
-//    @PreAuthorize(hasPermi = "system:logininfor:export")
-//    @PostMapping("/export")
-//    public void export(HttpServletResponse response, SysLogininfor logininfor) throws IOException
-//    {
-//        List<SysLogininfor> list = logininforService.selectLogininforList(logininfor);
-//        ExcelUtil<SysLogininfor> util = new ExcelUtil<SysLogininfor>(SysLogininfor.class);
-//        util.exportExcel(response, list, "登录日志");
-//    }
+    /**
+     * 导出登陆日志数据表格
+     * @param response
+     * @param logininfor
+     * @throws IOException
+     */
+    @Log(title = "登录日志", businessType = BusinessType.EXPORT)
+    @PreAuthorize(hasPermi = "system:logininfor:export")
+    @PostMapping("/export")
+    public void export(HttpServletResponse response, SysLogininfor logininfor) throws IOException
+    {
+        List<SysLogininfor> list = logininforService.selectLogininforList(logininfor);
+        ExcelUtil<SysLogininfor> util = new ExcelUtil<SysLogininfor>(SysLogininfor.class);
+        util.exportExcel(response, list, "登录日志");
+    }
 
     @PreAuthorize(hasPermi = "system:logininfor:remove")
     @Log(title = "登录日志", businessType = BusinessType.DELETE)

@@ -92,18 +92,18 @@
                         </el-form-item>
                     </el-col>
                     <el-col :span="24">
-                        <el-form-item label="菜单图标">
+                        <el-form-item v-if="form.menuType != 'F'" label="菜单图标">
                             <e-icon-picker v-model="form.icon"/>
                         </el-form-item>
                     </el-col>
                     <el-col :span="12">
                         <el-form-item label="菜单名称" prop="name">
-                            <el-input v-model="form.name" autocomplete="off" />
+                            <el-input v-model="form.name" />
                         </el-form-item>
                     </el-col>
                     <el-col :span="12">
                         <el-form-item label="显示排序" prop="orderNum">
-                            <el-input v-model="form.orderNum" autocomplete="off" />
+                            <el-input-number v-model="form.orderNum" controls-position="right" :min="0" />
                         </el-form-item>
                     </el-col>
                     <el-col :span="12">

@@ -80,9 +80,9 @@
             <el-col :span="1.5">
                 <el-button type="danger" plain size="mini" icon="el-icon-delete" @click="handleClean">清空</el-button>
             </el-col>
-<!--            <el-col :span="1.5">-->
-<!--                <el-button type="warning" plain size="mini" icon="el-icon-download" @click="handleExport">导出</el-button>-->
-<!--            </el-col>-->
+            <el-col :span="1.5">
+                <el-button type="warning" plain size="mini" icon="el-icon-download" @click="handleExport">导出</el-button>
+            </el-col>
             <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
         </el-row>
 
@@ -219,7 +219,7 @@
             });
         },
         methods: {
-            // 获取产品列表
+            // 获取操作日志列表
             getList(){
                 this.loading = true;
                 listOperlog(this.addDateRange(this.queryParams, this.dateRange))
@@ -237,18 +237,18 @@
             typeFormat(row, column) {
                 return this.selectDictLabel(this.typeOptions, row.businessType);
             },
-            // 搜索按钮操作
+            // 搜索按钮交互
             handleQuery() {
                 this.queryParams.pageNum = 1;
                 this.getList();
             },
-            // 重置按钮操作
+            // 重置按钮交互
             resetQuery() {
                 this.dateRange = [];
                 this.resetForm("queryForm");
                 this.handleQuery();
             },
-            /** 详细按钮操作 */
+            // 详细按钮交互
             handleView(row) {
                 this.dialogFormVisible = true;
                 this.form = row;
@@ -271,7 +271,7 @@
                     this.getList()
                 })
             },
-            /** 清空按钮操作 */
+            // 清空按钮交互
             handleClean() {
                 this.$confirm('是否确认清空所有操作日志数据项?', "警告", {
                     confirmButtonText: "确定",
@@ -283,6 +283,12 @@
                     this.getList();
                     this.Message.success("清空成功");
                 })
+            },
+            // 导出按钮交互
+            handleExport(){
+                this.download('system/operlog/export', {
+                    ...this.queryParams
+                }, `operlog_${new Date().getTime()}.xlsx`)
             },
             // 多选
             handleSelectionChange(val) {

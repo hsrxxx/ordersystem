@@ -1,6 +1,7 @@
 package com.hsrxxx.controller;
 
 
+import com.hsrxxx.common.core.utils.poi.ExcelUtil;
 import com.hsrxxx.common.core.web.controller.BaseController;
 import com.hsrxxx.common.core.web.domain.AjaxResult;
 import com.hsrxxx.common.core.web.page.TableDataInfo;
@@ -41,15 +42,21 @@ public class SysOperLogController extends BaseController {
         return getDataTable(list);
     }
 
-//    @Log(title = "操作日志", businessType = BusinessType.EXPORT)
-//    @PreAuthorize(hasPermi = "system:operlog:export")
-//    @PostMapping("/export")
-//    public void export(HttpServletResponse response, SysOperLog operLog) throws IOException
-//    {
-//        List<SysOperLog> list = operLogService.selectOperLogList(operLog);
-//        ExcelUtil<SysOperLog> util = new ExcelUtil<SysOperLog>(SysOperLog.class);
-//        util.exportExcel(response, list, "操作日志");
-//    }
+    /**
+     * 导出操作日志数据表格
+     * @param response
+     * @param operLog
+     * @throws IOException
+     */
+    @Log(title = "操作日志", businessType = BusinessType.EXPORT)
+    @PreAuthorize(hasPermi = "system:operlog:export")
+    @PostMapping("/export")
+    public void export(HttpServletResponse response, SysOperLog operLog) throws IOException
+    {
+        List<SysOperLog> list = operLogService.selectOperLogList(operLog);
+        ExcelUtil<SysOperLog> util = new ExcelUtil<SysOperLog>(SysOperLog.class);
+        util.exportExcel(response, list, "操作日志");
+    }
 
 
     @PreAuthorize(hasPermi = "system:operlog:remove")

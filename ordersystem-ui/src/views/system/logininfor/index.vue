@@ -64,9 +64,9 @@
             <el-col :span="1.5">
                 <el-button type="danger" plain size="mini" icon="el-icon-delete" @click="handleClean">清空</el-button>
             </el-col>
-<!--            <el-col :span="1.5">-->
-<!--                <el-button type="warning" plain size="mini" icon="el-icon-download" @click="handleExport">导出</el-button>-->
-<!--            </el-col>-->
+            <el-col :span="1.5">
+                <el-button type="warning" plain size="mini" icon="el-icon-download" @click="handleExport">导出</el-button>
+            </el-col>
             <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
         </el-row>
 
@@ -87,7 +87,7 @@
             <el-table-column label="操作系统" align="center" prop="os" />
             <el-table-column label="登录状态" align="center" prop="status" :formatter="statusFormat" />
             <el-table-column label="操作信息" align="center" prop="msg" />
-            <el-table-column label="操作日期" align="center" prop="loginTime" width="180" />
+            <el-table-column label="登陆日期" align="center" prop="loginTime" width="180" />
         </el-table>
 
         <!--  分页器  -->
@@ -155,12 +155,12 @@
             statusFormat(row) {
                 return this.selectDictLabel(this.statusOptions, row.status);
             },
-            // 搜索按钮操作
+            // 搜索按钮交互
             handleQuery() {
                 this.queryParams.pageNum = 1;
                 this.getList();
             },
-            // 重置按钮操作
+            // 重置按钮交互
             resetQuery() {
                 this.dateRange = [];
                 this.resetForm("queryForm");
@@ -184,7 +184,7 @@
                     this.getList()
                 })
             },
-            /** 清空按钮操作 */
+            // 清空按钮交互
             handleClean() {
                 this.$confirm('是否确认清空所有登录日志数据项?', "警告", {
                     confirmButtonText: "确定",
@@ -196,6 +196,12 @@
                     this.getList();
                     this.Message.success("清空成功");
                 })
+            },
+            // 导出按钮交互
+            handleExport(){
+                this.download('system/logininfor/export', {
+                    ...this.queryParams
+                }, `logininfor_${new Date().getTime()}.xlsx`)
             },
             // 多选
             handleSelectionChange(val) {

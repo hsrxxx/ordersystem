@@ -9,6 +9,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.hsrxxx.common.core.annotation.Excel;
+import com.hsrxxx.common.core.annotation.Excel.ColumnType;
 import com.hsrxxx.web.entity.BaseEntity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -33,16 +35,19 @@ public class SysLogininfor {
      * 访问ID
      */
         @TableId(value = "info_id", type = IdType.AUTO)
+        @Excel(name = "序号", cellType = ColumnType.NUMERIC)
       private Long infoId;
 
       /**
      * 用户账号
      */
+      @Excel(name = "用户账号")
       private String userName;
 
       /**
      * 登录IP地址
      */
+      @Excel(name = "地址")
       private String ipaddr;
 
       /**
@@ -63,17 +68,20 @@ public class SysLogininfor {
       /**
      * 登录状态（0成功 1失败）
      */
+      @Excel(name = "状态", readConverterExp = "0=成功,1=失败")
       private String status;
 
       /**
      * 提示消息
      */
+      @Excel(name = "描述")
       private String msg;
 
       /**
      * 访问时间
      */
       @JsonFormat(timezone = "GMT+8",pattern="yyyy-MM-dd HH:mm:ss")
+      @Excel(name = "访问时间", width = 30, dateFormat = "yyyy-MM-dd HH:mm:ss")
       private LocalDateTime loginTime;
 
       /** 请求参数 */

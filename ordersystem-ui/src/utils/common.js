@@ -5,7 +5,6 @@ export function resetForm(refName) {
     }
 }
 
-
 // 日期格式化
 export function parseTime(time, pattern) {
     if (arguments.length === 0 || !time) {
@@ -94,4 +93,23 @@ export function addDateRange(params, dateRange, propName) {
         }
     }
     return search;
+}
+
+// 通用下载方法
+export function download(fileName) {
+    window.location.href = baseURL + "/common/download?fileName=" + encodeURI(fileName) + "&delete=" + true;
+}
+
+/**
+ * 参数处理
+ * @param {*} params  参数
+ */
+export function tansParams(params) {
+    let result = ''
+    Object.keys(params).forEach((key) => {
+        if (!Object.is(params[key], undefined) && !Object.is(params[key], null) && !Object.is(JSON.stringify(params[key]), '{}')) {
+            result += encodeURIComponent(key) + '=' + encodeURIComponent(params[key]) + '&'
+        }
+    })
+    return result
 }
